@@ -1,4 +1,4 @@
-extends "res://fsm/player/OnAir.gd"
+extends "res://src/Actors/Player/MovementStates/OnAir.gd"
 
 func enter(_prev_info:={}) -> void:
 	.enter(_prev_info)

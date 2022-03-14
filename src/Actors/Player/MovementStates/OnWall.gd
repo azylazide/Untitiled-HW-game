@@ -1,3 +1,3 @@
-extends "res://fsm/player/player_state.gd"
+extends "res://src/Actors/Player/MovementStates/player_state.gd"
 
 

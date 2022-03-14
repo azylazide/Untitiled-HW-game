@@ -183,6 +183,6 @@ func _wall_kick():
 	return WALL_KICK_POWER*_tile_units/WALL_KICK_TIME
 
 #debug
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("debug_esc"):
-		$MainSM.switch_states("Death")
+#func _unhandled_input(event: InputEvent) -> void:
+#	if event.is_action_pressed("debug_esc"):
+#		$MovementSM.switch_states("Death")

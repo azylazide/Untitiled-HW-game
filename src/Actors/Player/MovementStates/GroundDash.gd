@@ -1,4 +1,4 @@
-extends "res://fsm/player/OnGround.gd"
+extends "res://src/Actors/Player/MovementStates/OnGround.gd"
 
 #dash duration
 var timer: Timer

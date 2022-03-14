@@ -1,4 +1,4 @@
-extends "res://fsm/player/player_state.gd"
+extends "res://src/Actors/Player/MovementStates/player_state.gd"
 
 #functions and variables for anything while on the ground
 

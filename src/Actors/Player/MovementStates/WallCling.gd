@@ -1,4 +1,4 @@
-extends "res://fsm/player/OnWall.gd"
+extends "res://src/Actors/Player/MovementStates/OnWall.gd"
 
 onready var clingtimer:= $ClingTime
 

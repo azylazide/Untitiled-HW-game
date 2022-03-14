@@ -1,9 +1,8 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://src/Actors/Player/MovementStatemachine.gd" type="Script" id=1]
-[ext_resource path="res://src/Actors/Player/MovementStates/OnGround.gd" type="Script" id=2]
+[ext_resource path="res://src/Actors/Player/ActionStatemachine.gd" type="Script" id=2]
 [ext_resource path="res://src/Actors/Player/MovementStates/Idle.gd" type="Script" id=3]
-[ext_resource path="res://src/Actors/Player/MovementStates/OnAir.gd" type="Script" id=4]
 [ext_resource path="res://src/Actors/Player/MovementStates/Run.gd" type="Script" id=5]
 [ext_resource path="res://src/Actors/Player/player.gd" type="Script" id=6]
 [ext_resource path="res://src/Actors/Player/MovementStates/Jump.gd" type="Script" id=7]
@@ -12,7 +11,6 @@
 [ext_resource path="res://src/Actors/Player/MovementStates/GroundDash.gd" type="Script" id=10]
 [ext_resource path="res://src/Actors/Player/MovementStates/AirDash.gd" type="Script" id=11]
 [ext_resource path="res://src/Actors/Player/ActionStates/Death.gd" type="Script" id=12]
-[ext_resource path="res://src/Actors/Player/MovementStates/OnWall.gd" type="Script" id=13]
 [ext_resource path="res://src/Actors/Player/MovementStates/WallCling.gd" type="Script" id=14]
 [ext_resource path="res://src/Actors/Player/FloorRayCast.gd" type="Script" id=15]
 
@@ -27,58 +25,62 @@ script = ExtResource( 6 )
 position = Vector2( 0, -60 )
 shape = SubResource( 1 )
 
-[node name="MainSM" type="Node" parent="."]
+[node name="MovementSM" type="Node" parent="."]
 script = ExtResource( 1 )
-state_group = "PlayerStates"
+state_group = "PlayerMoveStates"
 init_state = NodePath("MovementStates/OnGround/Idle")
 
-[node name="MovementStates" type="Node" parent="MainSM"]
+[node name="MovementStates" type="Node" parent="MovementSM"]
 script = ExtResource( 9 )
 
-[node name="OnGround" type="Node" parent="MainSM/MovementStates"]
-script = ExtResource( 2 )
+[node name="OnGround" type="Node" parent="MovementSM/MovementStates"]
 
-[node name="Idle" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+[node name="Idle" type="Node" parent="MovementSM/MovementStates/OnGround" groups=["PlayerMoveStates"]]
 script = ExtResource( 3 )
 
-[node name="Run" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+[node name="Run" type="Node" parent="MovementSM/MovementStates/OnGround" groups=["PlayerMoveStates"]]
 script = ExtResource( 5 )
 
-[node name="GDash" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+[node name="GDash" type="Node" parent="MovementSM/MovementStates/OnGround" groups=["PlayerMoveStates"]]
 script = ExtResource( 10 )
 
-[node name="Timer" type="Timer" parent="MainSM/MovementStates/OnGround/GDash"]
+[node name="Timer" type="Timer" parent="MovementSM/MovementStates/OnGround/GDash"]
+process_mode = 0
 one_shot = true
 
-[node name="OnAir" type="Node" parent="MainSM/MovementStates"]
-script = ExtResource( 4 )
+[node name="OnAir" type="Node" parent="MovementSM/MovementStates"]
 
-[node name="Jump" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+[node name="Jump" type="Node" parent="MovementSM/MovementStates/OnAir" groups=["PlayerMoveStates"]]
 script = ExtResource( 7 )
 
-[node name="WallJumpHold" type="Timer" parent="MainSM/MovementStates/OnAir/Jump"]
+[node name="WallJumpHold" type="Timer" parent="MovementSM/MovementStates/OnAir/Jump"]
+process_mode = 0
 one_shot = true
 
-[node name="Fall" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+[node name="Fall" type="Node" parent="MovementSM/MovementStates/OnAir" groups=["PlayerMoveStates"]]
 script = ExtResource( 8 )
 
-[node name="ADash" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+[node name="ADash" type="Node" parent="MovementSM/MovementStates/OnAir" groups=["PlayerMoveStates"]]
 script = ExtResource( 11 )
 
-[node name="Timer" type="Timer" parent="MainSM/MovementStates/OnAir/ADash"]
+[node name="Timer" type="Timer" parent="MovementSM/MovementStates/OnAir/ADash"]
+process_mode = 0
 one_shot = true
 
-[node name="OnWall" type="Node" parent="MainSM/MovementStates"]
-script = ExtResource( 13 )
+[node name="OnWall" type="Node" parent="MovementSM/MovementStates"]
 
-[node name="WallCling" type="Node" parent="MainSM/MovementStates/OnWall" groups=["PlayerStates"]]
+[node name="WallCling" type="Node" parent="MovementSM/MovementStates/OnWall" groups=["PlayerMoveStates"]]
 script = ExtResource( 14 )
 
-[node name="ClingTime" type="Timer" parent="MainSM/MovementStates/OnWall/WallCling"]
+[node name="ClingTime" type="Timer" parent="MovementSM/MovementStates/OnWall/WallCling"]
+process_mode = 0
 one_shot = true
 
-[node name="Death" type="Node" parent="MainSM" groups=["PlayerStates"]]
+[node name="Death" type="Node" parent="MovementSM" groups=["PlayerMoveStates"]]
 script = ExtResource( 12 )
+
+[node name="ActionSM" type="Node" parent="."]
+script = ExtResource( 2 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 0, -65 )
@@ -178,13 +180,17 @@ enabled = true
 cast_to = Vector2( 30, 0 )
 
 [node name="DashCooldown" type="Timer" parent="."]
+process_mode = 0
 one_shot = true
 
 [node name="CoyoteTime" type="Timer" parent="."]
+process_mode = 0
 one_shot = true
 
 [node name="JumpBufferTime" type="Timer" parent="."]
+process_mode = 0
 one_shot = true
 
 [node name="WallClingTime" type="Timer" parent="."]
+process_mode = 0
 one_shot = true
