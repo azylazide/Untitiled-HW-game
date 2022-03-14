@@ -1,0 +1,190 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://src/Actors/Player/MovementStatemachine.gd" type="Script" id=1]
+[ext_resource path="res://src/Actors/Player/MovementStates/OnGround.gd" type="Script" id=2]
+[ext_resource path="res://src/Actors/Player/MovementStates/Idle.gd" type="Script" id=3]
+[ext_resource path="res://src/Actors/Player/MovementStates/OnAir.gd" type="Script" id=4]
+[ext_resource path="res://src/Actors/Player/MovementStates/Run.gd" type="Script" id=5]
+[ext_resource path="res://src/Actors/Player/player.gd" type="Script" id=6]
+[ext_resource path="res://src/Actors/Player/MovementStates/Jump.gd" type="Script" id=7]
+[ext_resource path="res://src/Actors/Player/MovementStates/Fall.gd" type="Script" id=8]
+[ext_resource path="res://src/Actors/Player/MovementStates/player_state.gd" type="Script" id=9]
+[ext_resource path="res://src/Actors/Player/MovementStates/GroundDash.gd" type="Script" id=10]
+[ext_resource path="res://src/Actors/Player/MovementStates/AirDash.gd" type="Script" id=11]
+[ext_resource path="res://src/Actors/Player/ActionStates/Death.gd" type="Script" id=12]
+[ext_resource path="res://src/Actors/Player/MovementStates/OnWall.gd" type="Script" id=13]
+[ext_resource path="res://src/Actors/Player/MovementStates/WallCling.gd" type="Script" id=14]
+[ext_resource path="res://src/Actors/Player/FloorRayCast.gd" type="Script" id=15]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 25, 60 )
+
+[node name="player" type="KinematicBody2D"]
+collision_layer = 2
+script = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -60 )
+shape = SubResource( 1 )
+
+[node name="MainSM" type="Node" parent="."]
+script = ExtResource( 1 )
+state_group = "PlayerStates"
+init_state = NodePath("MovementStates/OnGround/Idle")
+
+[node name="MovementStates" type="Node" parent="MainSM"]
+script = ExtResource( 9 )
+
+[node name="OnGround" type="Node" parent="MainSM/MovementStates"]
+script = ExtResource( 2 )
+
+[node name="Idle" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+script = ExtResource( 3 )
+
+[node name="Run" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+script = ExtResource( 5 )
+
+[node name="GDash" type="Node" parent="MainSM/MovementStates/OnGround" groups=["PlayerStates"]]
+script = ExtResource( 10 )
+
+[node name="Timer" type="Timer" parent="MainSM/MovementStates/OnGround/GDash"]
+one_shot = true
+
+[node name="OnAir" type="Node" parent="MainSM/MovementStates"]
+script = ExtResource( 4 )
+
+[node name="Jump" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+script = ExtResource( 7 )
+
+[node name="WallJumpHold" type="Timer" parent="MainSM/MovementStates/OnAir/Jump"]
+one_shot = true
+
+[node name="Fall" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+script = ExtResource( 8 )
+
+[node name="ADash" type="Node" parent="MainSM/MovementStates/OnAir" groups=["PlayerStates"]]
+script = ExtResource( 11 )
+
+[node name="Timer" type="Timer" parent="MainSM/MovementStates/OnAir/ADash"]
+one_shot = true
+
+[node name="OnWall" type="Node" parent="MainSM/MovementStates"]
+script = ExtResource( 13 )
+
+[node name="WallCling" type="Node" parent="MainSM/MovementStates/OnWall" groups=["PlayerStates"]]
+script = ExtResource( 14 )
+
+[node name="ClingTime" type="Timer" parent="MainSM/MovementStates/OnWall/WallCling"]
+one_shot = true
+
+[node name="Death" type="Node" parent="MainSM" groups=["PlayerStates"]]
+script = ExtResource( 12 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 0, -65 )
+current = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = -23.0
+margin_top = -335.0
+margin_right = 62.0
+margin_bottom = -159.0
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_right = 85.0
+margin_bottom = 14.0
+text = "null"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 85.0
+margin_bottom = 32.0
+text = "null vel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label3" type="Label" parent="VBoxContainer"]
+margin_top = 36.0
+margin_right = 85.0
+margin_bottom = 50.0
+text = "null direction"
+
+[node name="Label4" type="Label" parent="VBoxContainer"]
+margin_top = 54.0
+margin_right = 85.0
+margin_bottom = 68.0
+text = "null"
+
+[node name="Label5" type="Label" parent="VBoxContainer"]
+margin_top = 72.0
+margin_right = 85.0
+margin_bottom = 86.0
+text = "null"
+
+[node name="Label6" type="Label" parent="VBoxContainer"]
+margin_top = 90.0
+margin_right = 85.0
+margin_bottom = 104.0
+text = "null"
+
+[node name="Label7" type="Label" parent="VBoxContainer"]
+margin_top = 108.0
+margin_right = 85.0
+margin_bottom = 122.0
+text = "null"
+
+[node name="Label8" type="Label" parent="VBoxContainer"]
+margin_top = 126.0
+margin_right = 85.0
+margin_bottom = 140.0
+text = "null"
+
+[node name="Label9" type="Label" parent="VBoxContainer"]
+margin_top = 144.0
+margin_right = 85.0
+margin_bottom = 158.0
+text = "null"
+
+[node name="Label10" type="Label" parent="VBoxContainer"]
+margin_top = 162.0
+margin_right = 85.0
+margin_bottom = 176.0
+text = "null"
+
+[node name="FloorRayCast" type="Position2D" parent="."]
+script = ExtResource( 15 )
+
+[node name="RayCast2D" type="RayCast2D" parent="FloorRayCast"]
+enabled = true
+cast_to = Vector2( 0, 10 )
+
+[node name="WallRayCast" type="Position2D" parent="."]
+position = Vector2( 0, -48 )
+
+[node name="LeftRay" type="RayCast2D" parent="WallRayCast"]
+enabled = true
+cast_to = Vector2( -30, 0 )
+
+[node name="RightRay" type="RayCast2D" parent="WallRayCast"]
+enabled = true
+cast_to = Vector2( 30, 0 )
+
+[node name="DashCooldown" type="Timer" parent="."]
+one_shot = true
+
+[node name="CoyoteTime" type="Timer" parent="."]
+one_shot = true
+
+[node name="JumpBufferTime" type="Timer" parent="."]
+one_shot = true
+
+[node name="WallClingTime" type="Timer" parent="."]
+one_shot = true
