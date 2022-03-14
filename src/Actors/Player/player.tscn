@@ -1,8 +1,9 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://src/Actors/Player/MovementStatemachine.gd" type="Script" id=1]
 [ext_resource path="res://src/Actors/Player/ActionStatemachine.gd" type="Script" id=2]
 [ext_resource path="res://src/Actors/Player/MovementStates/Idle.gd" type="Script" id=3]
+[ext_resource path="res://src/Actors/Player/ActionStates/Neutral.gd" type="Script" id=4]
 [ext_resource path="res://src/Actors/Player/MovementStates/Run.gd" type="Script" id=5]
 [ext_resource path="res://src/Actors/Player/player.gd" type="Script" id=6]
 [ext_resource path="res://src/Actors/Player/MovementStates/Jump.gd" type="Script" id=7]
@@ -11,8 +12,10 @@
 [ext_resource path="res://src/Actors/Player/MovementStates/GroundDash.gd" type="Script" id=10]
 [ext_resource path="res://src/Actors/Player/MovementStates/AirDash.gd" type="Script" id=11]
 [ext_resource path="res://src/Actors/Player/ActionStates/Death.gd" type="Script" id=12]
+[ext_resource path="res://src/Actors/Player/ActionStates/Attack.gd" type="Script" id=13]
 [ext_resource path="res://src/Actors/Player/MovementStates/WallCling.gd" type="Script" id=14]
 [ext_resource path="res://src/Actors/Player/FloorRayCast.gd" type="Script" id=15]
+[ext_resource path="res://src/Actors/Player/ActionStates/Alive.gd" type="Script" id=16]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 25, 60 )
@@ -76,11 +79,22 @@ script = ExtResource( 14 )
 process_mode = 0
 one_shot = true
 
-[node name="Death" type="Node" parent="MovementSM" groups=["PlayerMoveStates"]]
-script = ExtResource( 12 )
-
 [node name="ActionSM" type="Node" parent="."]
 script = ExtResource( 2 )
+state_group = "PlayerActionStates"
+init_state = NodePath("Alive/Neutral")
+
+[node name="Death" type="Node" parent="ActionSM" groups=["PlayerActionStates"]]
+script = ExtResource( 12 )
+
+[node name="Alive" type="Node" parent="ActionSM"]
+script = ExtResource( 16 )
+
+[node name="Attack" type="Node" parent="ActionSM/Alive" groups=["PlayerActionStates"]]
+script = ExtResource( 13 )
+
+[node name="Neutral" type="Node" parent="ActionSM/Alive" groups=["PlayerActionStates"]]
+script = ExtResource( 4 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 0, -65 )
@@ -159,6 +173,12 @@ text = "null"
 margin_top = 162.0
 margin_right = 85.0
 margin_bottom = 176.0
+text = "null"
+
+[node name="Label11" type="Label" parent="VBoxContainer"]
+margin_top = 180.0
+margin_right = 85.0
+margin_bottom = 194.0
 text = "null"
 
 [node name="FloorRayCast" type="Position2D" parent="."]

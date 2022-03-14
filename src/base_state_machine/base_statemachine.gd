@@ -3,6 +3,7 @@ class_name StateMachine
 #Base state machine class
 #Statemachine node must have state nodes as children and states added to a group
 
+signal changing_state
 
 #group of the state nodes 
 export(String) var state_group = null
@@ -17,9 +18,12 @@ var state_dict :={}
 
 
 func _ready():
+	#disables state machine if unassigned state group
 	set_physics_process(false)
 	set_process_unhandled_input(false)
 	set_process(false)
+	
+	#enable state machine
 	if _get_states():
 		_connect_states()
 		_initial_state(init_state)
@@ -58,6 +62,7 @@ func switch_states(_new_state: String) -> void:
 	current_state = state_dict[_new_state]
 	#enter new state passing old info
 	current_state._prev_state = old_state
+	emit_signal("changing_state", current_state.name, old_state.name)
 	current_state.enter(state_info)
 	pass
 
@@ -66,6 +71,7 @@ func _get_states() -> bool:
 	#catch if unassigned
 	if state_group == null:
 		return false
+	
 	_state_list = get_tree().get_nodes_in_group(state_group)
 	for s in _state_list:
 		state_dict[s.name] = s

@@ -21,8 +21,7 @@ func enter(_prev_info:={}) -> void:
 	
 func exit() -> Dictionary:
 	player.face_direction = sign(player.wall_normal.x)
-	.exit()
-	return _state_info
+	return .exit()
 
 func state_physics(_delta: float) -> void:
 	

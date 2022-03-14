@@ -3,8 +3,6 @@ extends Node
 class_name State
 #base class for states for StateMachine
 
-signal change_state
-
 var state_machine: Node
 var _state_info:={}
 var _prev_state: Node

@@ -14,7 +14,6 @@ func enter(_prev_info:={}) -> void:
 	if _prev_state.name == "Fall":
 		#immediate wall kick
 		if player.on_wall:
-			var direction = player.get_direction()
 			#single wall collision; wall cooldown over
 			if player.wall_normal != Vector2.ZERO and player.wall_cooldown.is_stopped():
 				walljump_holder.start()
