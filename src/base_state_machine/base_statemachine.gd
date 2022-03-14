@@ -17,10 +17,16 @@ var state_dict :={}
 
 
 func _ready():
-	_get_states()
-	_connect_states()
-	_initial_state(init_state)
-	
+	set_physics_process(false)
+	set_process_unhandled_input(false)
+	set_process(false)
+	if _get_states():
+		_connect_states()
+		_initial_state(init_state)
+		set_physics_process(true)
+		set_process_unhandled_input(true)
+		set_process(true)
+		
 	pass
 
 #relegate inputs to state
@@ -56,10 +62,14 @@ func switch_states(_new_state: String) -> void:
 	pass
 
 #get states from specified group and add to dict
-func _get_states() -> void:
+func _get_states() -> bool:
+	#catch if unassigned
+	if state_group == null:
+		return false
 	_state_list = get_tree().get_nodes_in_group(state_group)
 	for s in _state_list:
 		state_dict[s.name] = s
+	return true
 
 #pass self reference to the state nodes
 func _connect_states() -> void:
