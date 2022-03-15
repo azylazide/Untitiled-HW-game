@@ -41,6 +41,8 @@ onready var wall_cooldown:= $WallClingTime
 onready var left_raycast:= $WallRayCast/LeftRay
 onready var right_raycast:= $WallRayCast/RightRay
 
+onready var arrow_spawn:= $ArrowSpawn
+
 const SLOPE_STOP_THRESHOLD:= 100.0
 
 func _ready() -> void:
