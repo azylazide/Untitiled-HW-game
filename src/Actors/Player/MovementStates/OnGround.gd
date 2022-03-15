@@ -16,6 +16,6 @@ func state_input(_event: InputEvent) -> void:
 		if player.dash_cooldown.is_stopped():
 			player.dash_cooldown.start()
 			state_machine.switch_states("GDash")
-
+		
 func state_physics(_delta: float) -> void:
 	.state_physics(_delta)

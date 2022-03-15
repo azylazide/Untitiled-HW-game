@@ -19,19 +19,25 @@ var state_dict :={}
 
 func _ready():
 	#disables state machine if unassigned state group
-	set_physics_process(false)
-	set_process_unhandled_input(false)
-	set_process(false)
+	enable_statemachine(false)
 	
 	#enable state machine
 	if _get_states():
 		_connect_states()
 		_initial_state(init_state)
+		enable_statemachine(true)
+		
+	pass
+
+func enable_statemachine(enable:bool):
+	if enable:
 		set_physics_process(true)
 		set_process_unhandled_input(true)
 		set_process(true)
-		
-	pass
+	else:
+		set_physics_process(false)
+		set_process_unhandled_input(false)
+		set_process(false)
 
 #relegate inputs to state
 func _unhandled_input(_event: InputEvent) -> void:
