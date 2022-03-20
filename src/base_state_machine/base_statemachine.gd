@@ -4,6 +4,7 @@ class_name StateMachine
 #Statemachine node must have state nodes as children and states added to a group
 
 signal changing_state
+signal current_state
 
 #group of the state nodes 
 export(String) var state_group = null
@@ -50,6 +51,8 @@ func _process(_delta: float) -> void:
 
 #relegate physics to state
 func _physics_process(_delta: float) -> void:
+	#broadcast SM and current state
+	emit_signal("current_state", self.name, current_state.name)
 	current_state.state_physics(_delta)
 	pass
 
@@ -87,6 +90,7 @@ func _get_states() -> bool:
 func _connect_states() -> void:
 	for s in _state_list:
 		s.state_machine = self
+		connect("current_state", s, "initialize_inhibiting_connection")
 		pass
 
 #set initial state
