@@ -16,6 +16,10 @@ var _state_list := []
 #dict of states as name node pair
 var state_dict :={}
 
+#connection to other state machines for communication
+export(NodePath) var observed_SM = null
+var observed_SM_node: Node #statemachine
+var observed_state: String
 
 func _ready():
 	#disables state machine if unassigned state group
@@ -34,6 +38,12 @@ func enable_statemachine(enable:bool):
 		set_physics_process(true)
 		set_process_unhandled_input(true)
 		set_process(true)
+		
+		if not observed_SM == null:
+			observed_SM_node = get_node(observed_SM)
+			if observed_SM_node.has_method("on_observed_SM_state_changed"):
+				observed_SM_node.connect("changing_state",self,"on_observed_SM_state_changed")
+		
 	else:
 		set_physics_process(false)
 		set_process_unhandled_input(false)
@@ -95,6 +105,9 @@ func _initial_state(_s: NodePath) -> void:
 	current_state._prev_state = null
 	current_state.enter()
 	pass
+
+func on_observed_SM_state_changed(current: String, old: String) -> void:
+	observed_state = current
 
 #var leaves = []
 #find_leaves(state_machine_node, leaves)
