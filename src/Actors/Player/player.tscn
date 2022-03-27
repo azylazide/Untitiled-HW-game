@@ -32,6 +32,7 @@ shape = SubResource( 1 )
 script = ExtResource( 1 )
 state_group = "PlayerMoveStates"
 init_state = NodePath("MovementStates/OnGround/Idle")
+observed_SM = NodePath("../ActionSM")
 
 [node name="MovementStates" type="Node" parent="MovementSM"]
 script = ExtResource( 9 )
@@ -83,6 +84,7 @@ one_shot = true
 script = ExtResource( 2 )
 state_group = "PlayerActionStates"
 init_state = NodePath("Alive/Neutral")
+observed_SM = NodePath("../MovementSM")
 
 [node name="Death" type="Node" parent="ActionSM" groups=["PlayerActionStates"]]
 script = ExtResource( 12 )

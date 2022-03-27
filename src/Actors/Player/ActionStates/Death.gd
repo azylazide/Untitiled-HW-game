@@ -5,7 +5,7 @@ func _ready() -> void:
 	pass
 
 func enter(_prev_info:={}):
-	owner.get_node("MovementSM").enable_statemachine(false)
+	state_machine.observed_SM_node.enable_statemachine(false)
 	yield(get_tree().create_timer(5.0),"timeout")
 	owner.queue_free()
 	pass

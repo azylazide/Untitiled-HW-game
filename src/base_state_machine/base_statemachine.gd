@@ -18,7 +18,7 @@ var state_dict :={}
 
 #connection to other state machines for communication
 export(NodePath) var observed_SM = null
-var observed_SM_node: Node #statemachine
+var observed_SM_node #statemachine
 var observed_state: String
 
 func _ready():
