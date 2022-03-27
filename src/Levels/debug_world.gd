@@ -1,4 +1,4 @@
-extends Node
+extends WorldManager
 
 onready var arrow_scn:= preload("res://src/Projectiles/Arrows.tscn")
 

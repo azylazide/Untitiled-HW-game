@@ -23,11 +23,17 @@ _global_script_classes=[ {
 "class": "StateMachine",
 "language": "GDScript",
 "path": "res://src/base_state_machine/base_statemachine.gd"
+}, {
+"base": "Node",
+"class": "WorldManager",
+"language": "GDScript",
+"path": "res://src/Levels/world_manager.gd"
 } ]
 _global_script_class_icons={
 "ActorBase": "",
 "State": "",
-"StateMachine": ""
+"StateMachine": "",
+"WorldManager": ""
 }
 
 [application]
