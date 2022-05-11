@@ -94,7 +94,8 @@ func apply_gravity(delta) -> void:
 
 func calculate_velocity() -> void:
 	direction = get_direction()
-	velocity.x = lerp(velocity.x, MAX_WALK_TILE*_tile_units*direction,0.6)
+#	velocity.x = lerp(velocity.x, MAX_WALK_TILE*_tile_units*direction,0.6)
+	velocity.x = MAX_WALK_TILE*_tile_units*direction
 	
 func apply_movement() -> void:
 
@@ -159,7 +160,7 @@ func wall_check() -> bool:
 
 func is_floor_snap() -> Vector2:
 	#enable floor snap vector when snap to floor
-	var output:= Vector2.DOWN*43
+	var output:= Vector2.DOWN*50
 	if floor_snap:
 		return output
 	else:

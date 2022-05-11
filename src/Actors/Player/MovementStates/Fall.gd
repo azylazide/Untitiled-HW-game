@@ -2,6 +2,7 @@ extends "res://src/Actors/Player/MovementStates/OnAir.gd"
 
 func enter(_prev_info:={}) -> void:
 	.enter(_prev_info)
+	player.floor_snap = false
 	player.wall_cooldown.stop()
 
 func state_physics(_delta: float) -> void:

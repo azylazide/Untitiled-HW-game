@@ -19,3 +19,5 @@ func state_input(_event: InputEvent) -> void:
 		
 func state_physics(_delta: float) -> void:
 	.state_physics(_delta)
+
+	pass
