@@ -10,8 +10,8 @@ func state_physics(_delta: float) -> void:
 		state_machine.switch_states("Idle")
 	
 	#start coyote time
-	if not player.on_floor and player.was_on_floor:
-		player.coyote_timer.start()
+#	if not player.on_floor and player.was_on_floor:
+#		player.coyote_timer.start()
 	
 	#transition when coyote time is not active (both checks satisfy)
 	if not player.on_floor and not player.was_on_floor:

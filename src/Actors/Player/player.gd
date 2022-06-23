@@ -3,12 +3,12 @@ extends ActorBase
 #player controller script
 
 export(float) var COYOTE_TIME = 0.1
-export(float) var MIN_JUMP_HEIGHT = 0.5
+#export(float) var MIN_JUMP_HEIGHT = 0.5
 export(float) var JUMP_BUFFER_TIME = 0.1
 export(float) var DASH_LENGTH = 2.0
 export(float) var DASH_TIME = 0.2
 export(float) var DASH_COOLDOWN_TIME = 0.2
-export(float) var GAP_LENGTH = 12.5
+#export(float) var GAP_LENGTH = 12.5
 export(float) var WALL_COOLDOWN_TIME = 0.2
 export(float) var WALL_KICK_POWER = 2.5
 export(float) var WALL_KICK_TIME = 0.5
