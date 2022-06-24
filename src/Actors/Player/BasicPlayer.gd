@@ -11,17 +11,21 @@ export(float) var WALL_COOLDOWN_TIME = 0.2
 export(float) var WALL_KICK_POWER = 2.5
 export(float) var WALL_KICK_TIME = 0.5
 
-enum {IDLE,WALK,FALL,JUMP,GDASH,ADASH,WALL}
+enum STATES {IDLE,WALK,FALL,JUMP,GDASH,ADASH,WALL}
+export(STATES) var current_state = STATES.IDLE
 
 onready var floor_cast:= $RayCast2D
 onready var left_raycast:= $WallRays/LeftRay
 onready var right_raycast:= $WallRays/RightRay
 
 onready var coyote_timer:= $CoyoteTimer
+
 onready var jump_buffer_timer:= $JumpBufferTimer
+
 onready var wall_slide_timer:= $WallSlideTimer
 onready var wall_cooldown_timer:= $WallCooldownTimer
 onready var wall_jump_hold_timer:= $WallJumpHoldTimer
+
 onready var dash_timer:= $DashTimer
 onready var dash_cooldown_timer:= $DashCooldownTimer
 
@@ -32,10 +36,7 @@ onready var debugtext3:= $VBoxContainer/Label3
 onready var debugtext4:= $VBoxContainer/Label4
 onready var debugtext5:= $VBoxContainer/Label5
 onready var debugtext6:= $VBoxContainer/Label6
-onready var debugtext7:= $VBoxContainer/Label7
-
-
-onready var current_state:= IDLE 
+onready var debugtext7:= $VBoxContainer/Label7  
 
 onready var jump_gravity = Globals._gravity(JUMP_HEIGHT,MAX_WALK_TILE,GAP_LENGTH)
 onready var fall_gravity = Globals._gravity(1.5*JUMP_HEIGHT,MAX_WALK_TILE,0.8*GAP_LENGTH)
@@ -70,7 +71,7 @@ func _ready() -> void:
 	
 	wall_slide_timer.wait_time = 0.1
 	wall_cooldown_timer.wait_time = WALL_COOLDOWN_TIME
-	wall_jump_hold_timer.wait_time = 2
+	wall_jump_hold_timer.wait_time = 0.5
 	
 	face_direction = 1.0
 	
@@ -78,7 +79,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	
-	debugtext1.text = "state: " + str(current_state)
+	debugtext1.text = "velocity: " + str(velocity) + "\nposition: " + str(global_position)
 	debugtext2.text = "coyote: " + ("on" if not coyote_timer.is_stopped() else "off")
 	debugtext3.text = "is on floor: " + str(on_floor) + "\nwas on floor: " + str(was_on_floor)
 	debugtext4.text = "face dir: " + ("left" if face_direction < 0 else "right")
@@ -87,94 +88,121 @@ func _physics_process(delta: float) -> void:
 	debugtext7.text = "can ajump: " + str(can_ajump) + "\ncan adash: " + str(can_adash)
 	
 	match current_state:
-		IDLE:
+		STATES.IDLE:
+			#-Setup-
 			ground_reset()
 			var dir = get_direction()
 			velocity.x = 0
 			apply_gravity(delta)
 			var snap = Vector2.DOWN*50
 			
+			#-Movement-
 			was_on_floor = check_floor()
 			apply_movement(delta,snap)
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			#-Transitions-
+			#if moving
 			if dir != 0:
-				current_state = WALK
+				change_state(STATES.WALK)
+				
+			#if on air
 			if not on_floor:
+				#if was on floor, enable coyote time and not change state
 				if was_on_floor:
 					coyote_timer.start()
 				else:
-					change_state(FALL)
-					
+					change_state(STATES.FALL)
+			
+			#if pressed jumped previously and on floor
 			if not jump_buffer_timer.is_stopped() and on_floor:
 				jump_buffer_timer.stop()
 				enter_jump()
 			
-		WALK:
+		STATES.WALK:
+			#-Setup-
 			ground_reset()
 			var dir = get_direction()
 			apply_gravity(delta)
 			velocity.x = speed*dir
 			var snap = Vector2.DOWN*50
 			
+			#-Movement-
 			was_on_floor = check_floor()
 			apply_movement(delta,snap)
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			#-Transitions-
+			#if not inputting directions
 			if dir == 0 and on_floor:
-				change_state(IDLE)
+				change_state(STATES.IDLE)
 			
+			#if on air
 			if not on_floor:
+				#if was on floor, enable coyote time and not change state
 				if was_on_floor:
 					coyote_timer.start()
 				else:
-					change_state(FALL)
+					change_state(STATES.FALL)
 			
+			#if pressed jumped previously and on floor
 			if not jump_buffer_timer.is_stopped() and on_floor:
 				jump_buffer_timer.stop()
 				enter_jump()
 			
-		FALL:
+		STATES.FALL:
+			#-Setup-
 			var dir = get_direction()
 			apply_gravity(delta)
 			velocity.x = speed*dir
-			var snap = Vector2.DOWN*50
+			var snap = Vector2.ZERO
 			
+			#-Movement-
 			was_on_floor = check_floor()
 			apply_movement(delta,snap)
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			#-Transitions-
+			#if against a wall
 			if on_wall:
 				if dir != 0:
+					#if applying movement towards wall
 					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
-						change_state(WALL)
+						change_state(STATES.WALL)
 					elif wall_normal.x == 0:
 						wall_normal.x = -dir
 						#TODO
 			
+			#if landed
 			if on_floor:
-				change_state(IDLE)
+				change_state(STATES.IDLE)
 			
-		JUMP:
-			var dir = get_direction()
+		STATES.JUMP:
+			#-Setup-
+			var snap = Vector2.ZERO
 			apply_gravity(delta)
 			if wall_jump_hold_timer.is_stopped():
-				velocity.x = speed*dir
-			var snap = Vector2.ZERO
+				velocity.x = speed*get_direction()
 			
+			#-Movement-
 			was_on_floor = check_floor()
 			apply_movement(delta,snap)
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			#-Transitions-
+			#if peak of jump reached
 			if velocity.y > 0:
-				change_state(FALL)
+				change_state(STATES.FALL)
 		
-		GDASH:
+		STATES.GDASH:
+			#-Setup-
 			var snap = Vector2.DOWN*50
+			
+			#-Movement-
 			was_on_floor = check_floor()
 			if was_on_floor and on_floor:
 				apply_gravity(delta)
@@ -184,62 +212,81 @@ func _physics_process(delta: float) -> void:
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			
+			#-Transitions-
+			#if left the ground
 			if not on_floor:
 				if was_on_floor:
 					coyote_timer.wait_time = 0.08
 					coyote_timer.start()
 			
+			#when dash ends
 			if dash_timer.is_stopped():
 				if on_floor:
 					if get_direction() != 0:
-						change_state(WALK)
+						change_state(STATES.WALK)
 					else:
-						change_state(IDLE)
+						change_state(STATES.IDLE)
 				elif not on_floor and not was_on_floor:
-					change_state(FALL)
+					change_state(STATES.FALL)
 		
-		ADASH:
-			var snap = Vector2.DOWN*50
-			was_on_floor = check_floor()
-			apply_movement(delta,snap)
-			on_wall = check_wall()
-			
-			if dash_timer.is_stopped():
-				if on_floor:
-					if get_direction() != 0:
-						change_state(WALK)
-					else:
-						change_state(IDLE)
-				else:
-					change_state(FALL)
-		
-		WALL:
+		STATES.ADASH:
+			#-Setup-
 			var snap = Vector2.ZERO
-			if wall_slide_timer.is_stopped():
-				if get_direction()*wall_normal.x > 0:
-					change_state(FALL)
 			
-			velocity.y += 0.1*fall_gravity*delta
-			velocity.y = min(velocity.y,0.5*MAX_FALL_TILE*Globals.TILE_UNITS) 
-			
+			#-Movement-
 			was_on_floor = check_floor()
 			apply_movement(delta,snap)
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			#-Transitions-
+			#when dash ends
+			if dash_timer.is_stopped():
+				if on_floor:
+					if get_direction() != 0:
+						change_state(STATES.WALK)
+					else:
+						change_state(STATES.IDLE)
+				else:
+					change_state(STATES.FALL)
+		
+		STATES.WALL:
+			#-Setup-
+			var snap = Vector2.ZERO
+			
+			#-Transition-
+			#if moving away from wall
+			if wall_slide_timer.is_stopped():
+				if get_direction()*wall_normal.x > 0:
+					change_state(STATES.FALL)
+			
+			velocity.y += 0.1*fall_gravity*delta
+			velocity.y = min(velocity.y,0.5*MAX_FALL_TILE*Globals.TILE_UNITS) 
+			
+			#-Movement-
+			was_on_floor = check_floor()
+			apply_movement(delta,snap)
+			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			#-Transitions-
+			#if landed
 			if on_floor:
 				face_direction = sign(wall_normal.x)
-				change_state(IDLE)
+				change_state(STATES.IDLE)
+			
+			#if wall ended
 			if not on_wall:
 				face_direction = sign(wall_normal.x)
-				change_state(FALL)
+				change_state(STATES.FALL)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
-		if [IDLE,WALK].has(current_state):
+		if [STATES.IDLE,STATES.WALK].has(current_state):
 			if on_floor:
 				enter_jump()
-		elif [FALL].has(current_state):
+		elif [STATES.FALL].has(current_state):
 			if velocity.y > 0:
 				jump_buffer_timer.start()
 			if on_wall:
@@ -248,43 +295,48 @@ func _unhandled_input(event: InputEvent) -> void:
 				can_ajump = false
 				jump_buffer_timer.stop()
 				enter_jump()
-		elif [GDASH].has(current_state):
+		elif [STATES.GDASH].has(current_state):
 			if not coyote_timer.is_stopped() or on_floor:
 				enter_jump()
-		elif [WALL].has(current_state):
+		elif [STATES.WALL].has(current_state):
 			enter_jump()
 		
 	elif event.is_action_released("jump"):
-		if [JUMP].has(current_state):
+		if [STATES.JUMP].has(current_state):
 			if velocity.y < min_jump_force:
 				velocity.y = -min_jump_force
-				change_state(FALL)
+				change_state(STATES.FALL)
 	
 	elif event.is_action_pressed("dash"):
-		if [IDLE,WALK,GDASH].has(current_state):
+		if [STATES.IDLE,STATES.WALK,STATES.GDASH].has(current_state):
 			if dash_cooldown_timer.is_stopped():
 				enter_gdash()
-		elif [FALL,JUMP].has(current_state):
+		elif [STATES.FALL,STATES.JUMP].has(current_state):
 			if dash_cooldown_timer.is_stopped() and can_adash:
 				enter_adash()
-		elif [WALL].has(current_state):
+		elif [STATES.WALL].has(current_state):
 			face_direction = sign(wall_normal.x)
 			enter_adash()
 
+#-HELPER FUNCTIONS-
+
+#reset variables when landing
 func ground_reset() -> void:
 	can_adash = true
 	can_ajump = true
 
+#record previous state and change current state
 func change_state(next_state: int) -> void:
 	previous_state = current_state
 	current_state = next_state
 
+#check previous state before jump
 func enter_jump() -> void:
 	coyote_timer.stop()
-	change_state(JUMP)
+	change_state(STATES.JUMP)
 	
 	match previous_state:
-		FALL:
+		STATES.FALL:
 			if on_wall:
 				if wall_normal != Vector2.ZERO and wall_cooldown_timer.is_stopped():
 					wall_jump_hold_timer.start()
@@ -293,46 +345,53 @@ func enter_jump() -> void:
 					velocity.y = -jump_force
 			else:
 				velocity.y = -jump_force*0.8
-		GDASH:
+		STATES.GDASH:
 			velocity.y = -jump_force*1.2
-		WALL:
+		STATES.WALL:
 			wall_jump_hold_timer.start()
+			face_direction = sign(wall_normal.x)
 			velocity.x = wall_kick_force*face_direction
 			velocity.y = -jump_force
 		_:
 			velocity.y = -jump_force
 
+#necessary setup before transitioning to gdash
 func enter_gdash() -> void:
 	dash_cooldown_timer.start()
-	change_state(GDASH)
+	change_state(STATES.GDASH)
 	velocity.x = dash_force*face_direction
 	dash_timer.start()
 
+#necessary setup before transitioning to gdash
 func enter_adash() -> void:
 	dash_cooldown_timer.start()
 	can_adash = false
-	change_state(ADASH)
+	change_state(STATES.ADASH)
 	velocity.x = dash_force*face_direction
 	velocity.y = 0
 	dash_timer.start()
-	
+
+#necessary setup before transitioning to wall
 func enter_wall() -> void:
 	can_adash = true
 	velocity.x = 0
 	velocity.y = 0
 	wall_cooldown_timer.start()
 	wall_slide_timer.start()
-	change_state(WALL)
+	change_state(STATES.WALL)
 
+#get current input direction
 func get_direction() -> float:
 	return Input.get_axis("left","right")
 
+#check when on floor or coyote is enabled
 func check_floor() -> bool:
 	var output
 	output = is_on_floor()
 #	output = floor_cast.is_colliding()
 	return output or not coyote_timer.is_stopped()
 
+#check when against wall
 func check_wall() -> bool:
 	var left: bool = left_raycast.is_colliding()
 	var right: bool = right_raycast.is_colliding()
@@ -355,18 +414,24 @@ func check_wall() -> bool:
 	else:
 		return false
 
+#apply gravity according to current state condition
 func apply_gravity(delta: float) -> void:
+	#if coyote active
 	if not coyote_timer.is_stopped():
 		velocity.y = 0.0
 		return
 	
+	#if in the middle of a jump
 	if velocity.y < 0:
 		velocity.y += jump_gravity*delta
+	#after peak of jump
 	else:
 		velocity.y += fall_gravity*delta
 	
+	#terminal velocity
 	velocity.y = min(velocity.y,MAX_FALL_TILE*Globals.TILE_UNITS)
 
+#apply movement and save face direction
 func apply_movement(delta: float, snap: Vector2) -> void:
 	velocity = move_and_slide_with_snap(velocity,snap,Vector2.UP)
 	
