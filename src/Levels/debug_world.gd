@@ -14,3 +14,7 @@ func spawn_arrow(pos) -> void:
 	add_child(arrow)
 	pass
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_accept"):
+		var playerstats = $Player.player_stats
+		print(playerstats.get_property_list())

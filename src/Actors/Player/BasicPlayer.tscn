@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://src/Actors/Player/BasicPlayer.gd" type="Script" id=1]
+[ext_resource path="res://src/Actors/Player/Resources/PlayerStats.tres" type="Resource" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 25, 60 )
@@ -8,7 +9,10 @@ extents = Vector2( 25, 60 )
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 2
 script = ExtResource( 1 )
+player_stats = ExtResource( 2 )
+MAX_WALK_TILE = 8.25
 COYOTE_TIME = 0.2
+DASH_LENGTH = 4.0
 
 [node name="PlayerCollision" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -60 )
@@ -128,3 +132,5 @@ cast_to = Vector2( -30, 0 )
 [node name="RightRay" type="RayCast2D" parent="WallRays"]
 enabled = true
 cast_to = Vector2( 30, 0 )
+
+[node name="CameraCenter" type="Position2D" parent="."]

@@ -4,6 +4,8 @@ class_name ActorBase
 
 extends KinematicBody2D
 
+export(Resource) var player_stats
+
 export(float) var MAX_FALL_TILE = 15.0
 export(float) var MAX_WALK_TILE = 6.25
 export(float) var JUMP_HEIGHT = 5.5
@@ -16,3 +18,8 @@ var direction: float
 var face_direction: float
 var jump_force: float
 
+var health: float
+
+func _process(delta: float) -> void:
+	health = player_stats.health
+	print(health)
