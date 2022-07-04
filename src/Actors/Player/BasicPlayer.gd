@@ -110,6 +110,46 @@ func _physics_process(delta: float) -> void:
 		#pass control to player
 		pass
 	
+	_run_state(delta)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("jump"):
+		if [MOVEMENT_STATES.IDLE,MOVEMENT_STATES.WALK].has(current_movement_state):
+			if on_floor:
+				_enter_jump()
+		elif [MOVEMENT_STATES.FALL].has(current_movement_state):
+			if velocity.y > 0:
+				jump_buffer_timer.start()
+			if on_wall:
+				_enter_jump()
+			elif not on_wall and can_ajump:
+				can_ajump = false
+				jump_buffer_timer.stop()
+				_enter_jump()
+		elif [MOVEMENT_STATES.GDASH].has(current_movement_state):
+			if not coyote_timer.is_stopped() or on_floor:
+				_enter_jump()
+		elif [MOVEMENT_STATES.WALL].has(current_movement_state):
+			_enter_jump()
+		
+	elif event.is_action_released("jump"):
+		if [MOVEMENT_STATES.JUMP].has(current_movement_state):
+			if velocity.y < min_jump_force:
+				velocity.y = -min_jump_force
+				change_movement_state(MOVEMENT_STATES.FALL)
+	
+	elif event.is_action_pressed("dash"):
+		if [MOVEMENT_STATES.IDLE,MOVEMENT_STATES.WALK,MOVEMENT_STATES.GDASH].has(current_movement_state):
+			if dash_cooldown_timer.is_stopped():
+				_enter_gdash()
+		elif [MOVEMENT_STATES.FALL,MOVEMENT_STATES.JUMP].has(current_movement_state):
+			if dash_cooldown_timer.is_stopped() and can_adash:
+				_enter_adash()
+		elif [MOVEMENT_STATES.WALL].has(current_movement_state):
+			face_direction = sign(wall_normal.x)
+			_enter_adash()
+
+func _run_state(delta: float) -> void:
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
@@ -302,43 +342,7 @@ func _physics_process(delta: float) -> void:
 				if not on_wall:
 					face_direction = sign(wall_normal.x)
 					change_movement_state(MOVEMENT_STATES.FALL)
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("jump"):
-		if [MOVEMENT_STATES.IDLE,MOVEMENT_STATES.WALK].has(current_movement_state):
-			if on_floor:
-				_enter_jump()
-		elif [MOVEMENT_STATES.FALL].has(current_movement_state):
-			if velocity.y > 0:
-				jump_buffer_timer.start()
-			if on_wall:
-				_enter_jump()
-			elif not on_wall and can_ajump:
-				can_ajump = false
-				jump_buffer_timer.stop()
-				_enter_jump()
-		elif [MOVEMENT_STATES.GDASH].has(current_movement_state):
-			if not coyote_timer.is_stopped() or on_floor:
-				_enter_jump()
-		elif [MOVEMENT_STATES.WALL].has(current_movement_state):
-			_enter_jump()
-		
-	elif event.is_action_released("jump"):
-		if [MOVEMENT_STATES.JUMP].has(current_movement_state):
-			if velocity.y < min_jump_force:
-				velocity.y = -min_jump_force
-				change_movement_state(MOVEMENT_STATES.FALL)
-	
-	elif event.is_action_pressed("dash"):
-		if [MOVEMENT_STATES.IDLE,MOVEMENT_STATES.WALK,MOVEMENT_STATES.GDASH].has(current_movement_state):
-			if dash_cooldown_timer.is_stopped():
-				_enter_gdash()
-		elif [MOVEMENT_STATES.FALL,MOVEMENT_STATES.JUMP].has(current_movement_state):
-			if dash_cooldown_timer.is_stopped() and can_adash:
-				_enter_adash()
-		elif [MOVEMENT_STATES.WALL].has(current_movement_state):
-			face_direction = sign(wall_normal.x)
-			_enter_adash()
+	pass
 
 #-HELPER FUNCTIONS-
 
@@ -415,7 +419,8 @@ func get_direction() -> float:
 func check_floor() -> bool:
 	var output
 	output = is_on_floor()
-#	output = floor_cast.is_colliding() #might implement force ray cast update
+#	floor_cast.force_raycast_update()
+#	output = floor_cast.is_colliding()
 	return output or not coyote_timer.is_stopped()
 
 #check when against wall

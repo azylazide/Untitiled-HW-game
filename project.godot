@@ -121,6 +121,7 @@ debug_pause={
 
 2d_physics/layer_1="ground"
 2d_physics/layer_2="actors"
+2d_physics/layer_5="camera_areas"
 
 [physics]
 
