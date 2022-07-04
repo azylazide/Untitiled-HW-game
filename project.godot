@@ -15,6 +15,21 @@ _global_script_classes=[ {
 "path": "res://src/Actors/Actor_base.gd"
 }, {
 "base": "Resource",
+"class": "ActorResource",
+"language": "GDScript",
+"path": "res://src/Actors/ActorResource.gd"
+}, {
+"base": "Area2D",
+"class": "CameraBoundBox",
+"language": "GDScript",
+"path": "res://src/Props/CameraBoundBox.gd"
+}, {
+"base": "ActorResource",
+"class": "PlayerResource",
+"language": "GDScript",
+"path": "res://src/Actors/Player/Resources/PlayerResource.gd"
+}, {
+"base": "Resource",
 "class": "PlayerStats",
 "language": "GDScript",
 "path": "res://src/Actors/Player/Resources/PlayerStats.gd"
@@ -36,6 +51,9 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "ActorBase": "",
+"ActorResource": "",
+"CameraBoundBox": "",
+"PlayerResource": "",
 "PlayerStats": "",
 "State": "",
 "StateMachine": "",
