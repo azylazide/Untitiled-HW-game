@@ -1,0 +1,2 @@
+extends ActorResource
+class_name EnemyResource

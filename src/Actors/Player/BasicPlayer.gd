@@ -25,18 +25,18 @@ onready var floor_cast:= $RayCast2D
 onready var left_raycast:= $WallRays/LeftRay
 onready var right_raycast:= $WallRays/RightRay
 
-onready var coyote_timer:= $CoyoteTimer
+onready var coyote_timer:= $Timers/CoyoteTimer
 
-onready var jump_buffer_timer:= $JumpBufferTimer
+onready var jump_buffer_timer:= $Timers/JumpBufferTimer
 
-onready var wall_slide_timer:= $WallSlideTimer
-onready var wall_cooldown_timer:= $WallCooldownTimer
-onready var wall_jump_hold_timer:= $WallJumpHoldTimer
+onready var wall_slide_timer:= $Timers/WallSlideTimer
+onready var wall_cooldown_timer:= $Timers/WallCooldownTimer
+onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer
 
-onready var dash_timer:= $DashTimer
-onready var dash_cooldown_timer:= $DashCooldownTimer
+onready var dash_timer:= $Timers/DashTimer
+onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
 
-onready var auto_timer:= $AutoTimer
+onready var auto_timer:= $Timers/AutoTimer
 
 onready var camera = $PlayerCamera
 
@@ -76,6 +76,8 @@ func _ready() -> void:
 	speed = MAX_WALK_TILE*Globals.TILE_UNITS
 	
 	coyote_timer.wait_time = COYOTE_TIME
+	
+	jump_buffer_timer.wait_time = JUMP_BUFFER_TIME
 	
 	dash_timer.wait_time = DASH_TIME
 	dash_cooldown_timer.wait_time = DASH_COOLDOWN_TIME
