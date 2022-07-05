@@ -124,7 +124,7 @@ func _process(delta: float) -> void:
 		limit_top = temp_top
 		limit_right = temp_right
 		limit_bottom = temp_bottom
-	
+		
 	else:
 		#set defaults
 		limit_left = left_limit
