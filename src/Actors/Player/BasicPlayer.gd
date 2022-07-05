@@ -11,6 +11,10 @@ export(float) var WALL_COOLDOWN_TIME = 0.2
 export(float) var WALL_KICK_POWER = 2.5
 export(float) var WALL_KICK_TIME = 0.5
 
+export(float) var AUTO_TIME = 0.15
+
+export(int, -1,1) var INITIAL_DIRECTION:= 1
+
 enum MOVEMENT_STATES {IDLE,WALK,FALL,JUMP,GDASH,ADASH,WALL}
 export(MOVEMENT_STATES) var current_movement_state = MOVEMENT_STATES.IDLE
 
@@ -32,7 +36,9 @@ onready var wall_jump_hold_timer:= $WallJumpHoldTimer
 onready var dash_timer:= $DashTimer
 onready var dash_cooldown_timer:= $DashCooldownTimer
 
-onready var camera = $Camera2D
+onready var auto_timer:= $AutoTimer
+
+onready var camera = $PlayerCamera
 
 onready var debugtext1:= $VBoxContainer/Label
 onready var debugtext2:= $VBoxContainer/Label2
@@ -79,6 +85,9 @@ func _ready() -> void:
 	wall_cooldown_timer.wait_time = WALL_COOLDOWN_TIME
 	wall_jump_hold_timer.wait_time = 0.5
 	
+	auto_timer.wait_time = AUTO_TIME
+	auto_timer.start()
+	
 	face_direction = 1.0
 	
 	on_floor = check_floor()
@@ -96,21 +105,10 @@ func _physics_process(delta: float) -> void:
 	
 	#initial state at spawn
 	if previous_movement_state < 0:
-		#ignore player input
+		_initialize_state(delta)
 		
-		#when walk
-			#apply initial walk
-		#when idle
-		
-		#when fall
-		
-		#when jump
-			#initial launch
-		
-		#pass control to player
-		pass
-	
-	_run_state(delta)
+	else:
+		_run_state(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
@@ -149,6 +147,120 @@ func _unhandled_input(event: InputEvent) -> void:
 			face_direction = sign(wall_normal.x)
 			_enter_adash()
 
+func _initialize_state(delta: float) -> void:
+	#ignore player input
+		
+	match current_movement_state:
+		#when walk
+		MOVEMENT_STATES.WALK:
+			#apply initial walk
+			#-Setup-
+			_ground_reset()
+			var dir = INITIAL_DIRECTION
+			_apply_gravity(delta)
+			velocity.x = speed*dir
+			var snap = Vector2.DOWN*50
+			
+			#-Movement-
+			was_on_floor = check_floor()
+			_apply_movement(delta,dir,snap)
+			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			#-Transitions-
+			#if not inputting directions
+			if auto_timer.is_stopped() and on_floor:
+				change_movement_state(MOVEMENT_STATES.IDLE)
+			
+			#if on air
+			if not on_floor:
+				#if was on floor, enable coyote time and not change state
+				if was_on_floor:
+					coyote_timer.start()
+				else:
+					change_movement_state(MOVEMENT_STATES.FALL)
+
+		#when idle
+		MOVEMENT_STATES.IDLE:
+			#-Setup-
+			_ground_reset()
+			var dir = get_direction()
+			velocity.x = 0
+			_apply_gravity(delta)
+			var snap = Vector2.DOWN*50
+			
+			#-Movement-
+			was_on_floor = check_floor()
+			_apply_movement(delta,dir,snap)
+			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			#-Transitions-
+			#if moving
+			if dir != 0:
+				change_movement_state(MOVEMENT_STATES.WALK)
+				
+			#if on air
+			if not on_floor:
+				#if was on floor, enable coyote time and not change state
+				if was_on_floor:
+					coyote_timer.start()
+				else:
+					change_movement_state(MOVEMENT_STATES.FALL)
+			
+			#if pressed jumped previously and on floor
+			if not jump_buffer_timer.is_stopped() and on_floor:
+				jump_buffer_timer.stop()
+				_enter_jump()
+		
+		#when fall
+		MOVEMENT_STATES.FALL:
+			#-Setup-
+			var dir = get_direction()
+			_apply_gravity(delta)
+			velocity.x = speed*dir
+			var snap = Vector2.ZERO
+			
+			#-Movement-
+			was_on_floor = check_floor()
+			_apply_movement(delta,dir,snap)
+			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			#-Transitions-
+			#if against a wall
+			if on_wall:
+				if dir != 0:
+					#if applying movement towards wall
+					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
+						change_movement_state(MOVEMENT_STATES.WALL)
+					elif wall_normal.x == 0:
+						wall_normal.x = -dir
+						#TODO
+			
+			#if landed
+			if on_floor:
+				change_movement_state(MOVEMENT_STATES.IDLE)
+		
+		#when jump
+		MOVEMENT_STATES.JUMP:
+			#initial launch
+			var dir:= INITIAL_DIRECTION
+			if not auto_timer.is_stopped():
+				velocity.y = -jump_force
+			var snap = Vector2.ZERO
+			_apply_gravity(delta)
+			was_on_floor = check_floor()
+			_apply_movement(delta,dir,snap)
+			on_floor = check_floor()
+			
+			if velocity.y > 0:
+				change_movement_state(MOVEMENT_STATES.FALL)
+			pass
+		
+	#pass control to player
+	pass
+
 func _run_state(delta: float) -> void:
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
@@ -162,7 +274,7 @@ func _run_state(delta: float) -> void:
 				
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -194,7 +306,7 @@ func _run_state(delta: float) -> void:
 				
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -225,7 +337,7 @@ func _run_state(delta: float) -> void:
 				
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -248,12 +360,13 @@ func _run_state(delta: float) -> void:
 				#-Setup-
 				var snap = Vector2.ZERO
 				_apply_gravity(delta)
+				var dir = get_direction()
 				if wall_jump_hold_timer.is_stopped():
-					velocity.x = speed*get_direction()
+					velocity.x = speed*dir
 				
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -265,14 +378,14 @@ func _run_state(delta: float) -> void:
 			MOVEMENT_STATES.GDASH:
 				#-Setup-
 				var snap = Vector2.DOWN*50
-				
+				var dir = get_direction()
 				#-Movement-
 				was_on_floor = check_floor()
 				if was_on_floor and on_floor:
 					_apply_gravity(delta)
 				else:
 					velocity.y = 0
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -297,10 +410,10 @@ func _run_state(delta: float) -> void:
 			MOVEMENT_STATES.ADASH:
 				#-Setup-
 				var snap = Vector2.ZERO
-				
+				var dir = get_direction()
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -318,12 +431,13 @@ func _run_state(delta: float) -> void:
 			MOVEMENT_STATES.WALL:
 				#-Setup-
 				var snap = Vector2.ZERO
+				var dir = get_direction()
 				velocity.y += 0.1*fall_gravity*delta
 				velocity.y = min(velocity.y,0.5*MAX_FALL_TILE*Globals.TILE_UNITS) 
 				
 				#-Movement-
 				was_on_floor = check_floor()
-				_apply_movement(delta,snap)
+				_apply_movement(delta,dir,snap)
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
@@ -464,10 +578,10 @@ func _apply_gravity(delta: float) -> void:
 	velocity.y = min(velocity.y,MAX_FALL_TILE*Globals.TILE_UNITS)
 
 #apply movement and save face direction
-func _apply_movement(delta: float, snap: Vector2) -> void:
+func _apply_movement(delta: float, dir: float, snap: Vector2) -> void:
 	velocity = move_and_slide_with_snap(velocity,snap,Vector2.UP)
 	
-	if get_direction() == 0:
+	if dir == 0:
 		return
 	else:
-		face_direction = -1 if get_direction() < 0 else 1
+		face_direction = -1 if dir < 0 else 1
