@@ -139,6 +139,9 @@ position = Vector2( 5664, -832 )
 collision_layer = 16
 monitoring = false
 script = ExtResource( 6 )
+limit_left = false
+limit_top = false
+limit_right = false
 priority_level = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxes/CameraBoundBox6"]

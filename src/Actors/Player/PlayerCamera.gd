@@ -84,10 +84,10 @@ func _process(delta: float) -> void:
 			var shape: RectangleShape2D = collision.shape
 			var extents: Vector2 = shape.extents
 		
-			left_array.append(int(collision.global_position.x-extents.x) if area.limit_left else -defaults)
-			top_array.append(int(collision.global_position.y-extents.y) if area.limit_top else -defaults)
-			right_array.append(int(collision.global_position.x+extents.x) if area.limit_right else -defaults)
-			bottom_array.append(int(collision.global_position.y+extents.y) if area.limit_bottom else -defaults)
+			left_array.append(int(collision.global_position.x-extents.x) if area.limit_left else left_limit)
+			top_array.append(int(collision.global_position.y-extents.y) if area.limit_top else top_limit)
+			right_array.append(int(collision.global_position.x+extents.x) if area.limit_right else right_limit)
+			bottom_array.append(int(collision.global_position.y+extents.y) if area.limit_bottom else bottom_limit)
 			
 			priorities.append(area.priority_level)
 		
