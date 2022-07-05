@@ -1,4 +1,12 @@
 extends Camera2D
+
+var bbox_array = []
+var defaults:= 10000000
+var left_limit:= -defaults 
+var top_limit:= -defaults 
+var right_limit:= defaults 
+var bottom_limit:= defaults 
+
 #Requirements
 #When idle
 # player is near center of screen but camera biased to their facing by a subtle offset
@@ -56,28 +64,82 @@ extends Camera2D
 #	when walljump
 #		first few secs of the wallkick, lerp is slow
 
-var defaults:= 10000000
-
 func _ready() -> void:
 	pass
 
-
-func _on_CameraBBoxDetector_area_entered(area: Area2D) -> void:
-	var collision_shape: CollisionShape2D = area.get_node("CollisionShape2D")
-	var extents: Vector2 = collision_shape.shape.extents
+func _process(delta: float) -> void:
 	
-	limit_left = int(collision_shape.global_position.x-extents.x)
-	limit_right = int(collision_shape.global_position.x+extents.x)
-	limit_top = int(collision_shape.global_position.y-extents.y)
-	limit_bottom = int(collision_shape.global_position.y+extents.y)
+	#when intersecting
+	if not bbox_array.empty():
+		var left_array:= []
+		var top_array:= []
+		var right_array:= []
+		var bottom_array:= []
+		
+		var priorities:= []
+		
+		#save limits of each area in bbox array
+		for area in bbox_array:
+			var collision: CollisionShape2D = area.get_node("CollisionShape2D")
+			var shape: RectangleShape2D = collision.shape
+			var extents: Vector2 = shape.extents
+		
+			left_array.append(int(collision.global_position.x-extents.x) if area.limit_left else -defaults)
+			top_array.append(int(collision.global_position.y-extents.y) if area.limit_top else -defaults)
+			right_array.append(int(collision.global_position.x+extents.x) if area.limit_right else -defaults)
+			bottom_array.append(int(collision.global_position.y+extents.y) if area.limit_bottom else -defaults)
+			
+			priorities.append(area.priority_level)
+		
+		#find the highest priority area
+		var max_priority: int = priorities.max()
+		
+		#set temp limits
+		var temp_left: int = left_array[priorities.find(max_priority)]
+		var temp_top: int = top_array[priorities.find(max_priority)]
+		var temp_right: int = right_array[priorities.find(max_priority)]
+		var temp_bottom: int = bottom_array[priorities.find(max_priority)]
+		
+		#for duplicate high priority
+		if priorities.count(max_priority) > 1:
+			var max_indices = []
+			for i in priorities.size():
+				if priorities[i] == max_priority:
+					max_indices.append(i)
+			
+			#compare which has smaller constraint
+			#and set it as new temp limit
+			for i in max_indices:
+				if temp_left < left_array[i]:
+					temp_left = left_array[i]
+				if temp_top < top_array[i]:
+					temp_top = top_array[i]
+				if temp_right < right_array[i]:
+					temp_right = right_array[i]
+				if temp_bottom < bottom_array[i]:
+					temp_bottom = bottom_array[i]
+		
+		#set temp limit as limit
+		limit_left = temp_left
+		limit_top = temp_top
+		limit_right = temp_right
+		limit_bottom = temp_bottom
 	
-	pass # Replace with function body.
+	else:
+		#set defaults
+		limit_left = left_limit
+		limit_top = top_limit
+		limit_right = right_limit
+		limit_bottom = bottom_limit
+	
+
+func _on_CameraBBoxDetector_area_entered(area: CameraBoundBox) -> void:
+	#add to array
+	bbox_array.append(area)
+	pass
 
 
-func _on_CameraBBoxDetector_area_exited(area: Area2D) -> void:
-#	var collision_shape: CollisionShape2D = area.get_node("CollisionShape2D")
-
-	limit_left = -defaults
-	limit_right = defaults
-	limit_top = -defaults
-	limit_bottom = defaults
+func _on_CameraBBoxDetector_area_exited(area: CameraBoundBox) -> void:
+	#remove from array
+	bbox_array.erase(area)
+	pass

@@ -81,6 +81,7 @@ position = Vector2( 2306, -96 )
 collision_layer = 16
 monitoring = false
 script = ExtResource( 6 )
+priority_level = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxes/CameraBoundBox"]
 shape = SubResource( 3 )
@@ -90,6 +91,7 @@ position = Vector2( 4288, -1344 )
 collision_layer = 16
 monitoring = false
 script = ExtResource( 6 )
+priority_level = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxes/CameraBoundBox2"]
 shape = SubResource( 4 )
@@ -99,6 +101,7 @@ position = Vector2( -2688, -336 )
 collision_layer = 16
 monitoring = false
 script = ExtResource( 6 )
+priority_level = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxes/CameraBoundBox3"]
 position = Vector2( 576, 240 )
@@ -109,6 +112,7 @@ position = Vector2( -5120, -336 )
 collision_layer = 16
 monitoring = false
 script = ExtResource( 6 )
+priority_level = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxes/CameraBoundBox4"]
 position = Vector2( 576, 240 )
