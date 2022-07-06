@@ -151,60 +151,13 @@ func _new_canvas_transform(ct_o: Vector2, gp: Vector2, ss: Vector2, fc: float,
 							cs: int) -> Vector2:
 	#separate x,y	
 	var temp:= -gp + ss/2
-	var new_x: float
-	var new_y: float
+	var new_x:= temp.x
+	var new_y:= temp.y
 	
-	if player_node.previous_movement_state < 0:
+	var previous_movement_state: int = player_node.previous_movement_state
+	
+	if previous_movement_state < 0:
 		return temp
-	
-	match cs:
-		player_node.MOVEMENT_STATES.IDLE:
-			current_offset = _get_offset(current_offset,fc)
-			
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
-			new_y = lerp(ct_o.y,temp.y,0.1)
-			
-		player_node.MOVEMENT_STATES.WALK:
-			current_offset = _get_offset(current_offset,fc,Vector2(-3*Globals.TILE_UNITS,0))
-			
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
-			new_y = lerp(ct_o.y,temp.y,0.1)
-			
-		player_node.MOVEMENT_STATES.FALL:
-			if player_node.direction != 0:
-				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,-4.5*Globals.TILE_UNITS))
-				
-				new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
-			else:
-				current_offset = _get_offset(current_offset,fc,Vector2(0,-4.5*Globals.TILE_UNITS))
-				
-				new_x = lerp(ct_o.x,temp.x,0.01)
-				
-			new_y = lerp(ct_o.y,temp.y+current_offset.y,0.05)
-		player_node.MOVEMENT_STATES.JUMP:
-			if player_node.direction != 0:
-				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,1.5*Globals.TILE_UNITS))
-			else:
-				current_offset = _get_offset(current_offset,fc,Vector2(0,1.5*Globals.TILE_UNITS))
-			
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.05)
-			new_y = lerp(ct_o.y,temp.y+current_offset.y,0.1)
-		player_node.MOVEMENT_STATES.GDASH:
-			current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,0))
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
-			new_y = lerp(ct_o.y,temp.y,0.1)
-		player_node.MOVEMENT_STATES.ADASH:
-			current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,0))
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
-			new_y = lerp(ct_o.y,temp.y,0.1)
-		player_node.MOVEMENT_STATES.WALL:
-			if player_node.velocity.y > 0:
-				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,-1.5*Globals.TILE_UNITS))
-				new_y = lerp(ct_o.y,temp.y+current_offset.y,0.05)
-			else:
-				new_y = lerp(ct_o.y,temp.y,0.05)
-			
-			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.05)
 		
 	return Vector2(new_x,new_y)
 	

@@ -70,6 +70,9 @@ var wall_kick_force: float
 var previous_movement_state:= -1
 var previous_action_state:= -1
 
+signal state_changed()
+var _changing_state_flag:= false
+
 func _ready() -> void:
 	jump_force = Globals._jump_vel(MAX_WALK_TILE,JUMP_HEIGHT,GAP_LENGTH)
 	min_jump_force = Globals._jump_vel(MAX_WALK_TILE,MIN_JUMP_HEIGHT,GAP_LENGTH/2.0)
@@ -266,6 +269,8 @@ func _initialize_state(delta: float) -> void:
 	pass
 
 func _run_state(delta: float) -> void:
+	_changing_state_flag = false
+	
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
@@ -463,7 +468,9 @@ func _run_state(delta: float) -> void:
 				
 				#if still on wall
 				face_direction = sign(wall_normal.x)
-	pass
+	
+	if _changing_state_flag:
+		emit_signal("state_changed")
 
 #-HELPER FUNCTIONS-
 
@@ -476,6 +483,7 @@ func _ground_reset() -> void:
 func change_movement_state(next_state: int) -> void:
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
+	_changing_state_flag = true
 
 #record previous state and change current state
 func change_action_state(next_state: int) -> void:
