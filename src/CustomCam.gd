@@ -37,7 +37,9 @@ func _physics_process(delta: float) -> void:
 	var canvas_transform: Transform2D = get_viewport().canvas_transform
 	var new_transform:= _update_transform(canvas_transform)
 	#clamp cam at edges when in bounds
-	new_transform = _clamp_on_bounds(new_transform)
+	var clamp_transform = _clamp_on_bounds(new_transform)
+	#interpolate transform
+	new_transform = _interp_transform(canvas_transform,new_transform,clamp_transform)
 	#apply camera
 	get_viewport().canvas_transform = new_transform
 	pass
@@ -47,11 +49,10 @@ func _update_transform(canvas_transform: Transform2D) -> Transform2D:
 		
 	var player_movement_state: int = player_node.current_movement_state
 	
-	canvas_transform.origin = _new_canvas_transform(canvas_transform.origin,
+	canvas_transform.origin = _new_canvas_origin(canvas_transform.origin,
 													player_node.global_position,
 													screen_size,
-													face_dir,
-													player_movement_state)
+													face_dir)
 
 	return canvas_transform
 
@@ -147,6 +148,36 @@ func _clamp_on_bounds(transform: Transform2D) -> Transform2D:
 		pass
 	return transform
 
+func _interp_transform(old_transform: Transform2D, new_transform: Transform2D, clamp_transform: Transform2D) -> Transform2D:
+	
+	#horizontal
+	var horizontal_smoothing = 0.1
+	#insert when player is too far from camera
+	
+	#when wall jumping
+	if (player_node.previous_movement_state == player_node.MOVEMENT_STATES.WALL and
+		player_node.current_movement_state == player_node.MOVEMENT_STATES.JUMP):
+			horizontal_smoothing = 0.1 
+	#when moving and not wall jumping
+	else:
+		if player_node.velocity.x != 0:
+			horizontal_smoothing = 0.5
+	
+	
+	#vertical
+	var vertical_smoothing = 0.1
+	#when falling
+	if player_node.current_movement_state == player_node.MOVEMENT_STATES.FALL:
+		#when camera is further above
+		if ((old_transform.origin.y-clamp_transform.origin.y > 0) and 
+			(old_transform.origin.y-new_transform.origin.y > 0)):
+				vertical_smoothing = 0.9
+	
+	new_transform.origin.x = lerp(old_transform.origin.x,clamp_transform.origin.x,horizontal_smoothing)
+	new_transform.origin.y = lerp(old_transform.origin.y,clamp_transform.origin.y,vertical_smoothing)
+	
+	return new_transform
+
 #might be a problem when detectors fire before camera is ready
 func on_CameraBBoxDetector_area_entered(area: Area2D):
 	bbox_array.append(area)
@@ -170,20 +201,7 @@ func _get_offset(current_offset: Vector2, face_dir: float, is_down: bool) -> Vec
 	else:
 		return current_offset
 	
-func _new_canvas_transform(ct_o: Vector2, gp: Vector2, ss: Vector2, fc: float, 
-							cs: int) -> Vector2:
+func _new_canvas_origin(ct_o: Vector2, gp: Vector2, ss: Vector2, fc: float) -> Vector2:
 	#separate x,y	
-	var temp:= -gp + ss/2 + _get_offset(current_offset,fc,false)
-	var new_x:= temp.x
-	var new_y:= temp.y
-	
-	var previous_movement_state: int = player_node.previous_movement_state
-	
-	
-	
-	if previous_movement_state < 0:
-		return temp
-		
-	return Vector2(new_x,new_y)
-	
-	pass
+	return -gp + ss/2 + _get_offset(current_offset,fc,false)
+
