@@ -5,26 +5,59 @@ export(NodePath) var player_path
 onready var player_node: ActorBase = get_node(player_path)
 onready var screen_size: Vector2 = get_viewport().get_visible_rect().size
 
-export(Vector2) var offset = Vector2.ZERO
+export(float) var x_offset_tiles = 0.8
+export(float,0,1) var smoothing = 0.8
+
+onready var x_offset: float = x_offset_tiles*Globals.TILE_UNITS
+onready var current_offset:= Vector2(x_offset,0)
 
 var bbox_array = []
 
 func _ready() -> void:
+	#connect the detector to camera
 	player_node.camera_bbox_detector.connect("area_entered",self,"on_CameraBBoxDetector_area_entered")
 	player_node.camera_bbox_detector.connect("area_exited",self,"on_CameraBBoxDetector_area_exited")
-
+	
+	#get current offset
+	var initial_face_dir: float = player_node.face_direction
+	current_offset = _check_face_dir(current_offset,initial_face_dir)
+	
+	
+	var initial_player_movement_state: int = player_node.current_movement_state
+	
+	#set initial position
 	var canvas_transform: Transform2D = get_viewport().canvas_transform
-	canvas_transform.origin = -player_node.global_position + screen_size/2
+	canvas_transform.origin = _new_canvas_transform(canvas_transform.origin,
+													player_node.global_position,
+													screen_size,
+													current_offset,
+													smoothing,
+													initial_player_movement_state)
+	
+	#apply camera
 	get_viewport().canvas_transform = canvas_transform
 
 	pass
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	#get current offset
+	var face_dir: float = player_node.face_direction
+	current_offset = _check_face_dir(current_offset,face_dir)
+	
+	var player_movement_state: int = player_node.current_movement_state
+	
 	var canvas_transform: Transform2D = get_viewport().canvas_transform
-	canvas_transform.origin = -player_node.global_position + screen_size/2
+	
+	canvas_transform.origin = _new_canvas_transform(canvas_transform.origin,
+													player_node.global_position,
+													screen_size,
+													current_offset,
+													smoothing,
+													player_movement_state)
 	
 	#clamp cam at edges when in bounds
 	
+	#apply camera
 	get_viewport().canvas_transform = canvas_transform
 	pass
 
@@ -98,10 +131,33 @@ func _get_bounds(delta: float) -> void:
 		
 		pass
 
+
+#might be a problem when detectors fire before camera is ready
 func on_CameraBBoxDetector_area_entered(area: Area2D):
 	print("enter")
 	pass
 
 func on_CameraBBoxDetector_area_exited(area: Area2D):
 	print("exit")
+	pass
+
+func _check_face_dir(current_offset: Vector2, face_dir: float) -> Vector2:
+	if face_dir > 0:
+		return Vector2(x_offset,0)
+	elif face_dir < 0:
+		return -Vector2(x_offset,0)
+	else:
+		return current_offset
+	
+func _new_canvas_transform(ct_o: Vector2, gp: Vector2, ss: Vector2, os: Vector2, 
+							smoothing: float, cs: int) -> Vector2:
+	#separate x,y
+	var temp_x:= -gp.x + ss.x/2 - os.x
+	var new_x: float = lerp(ct_o.x,temp_x,smoothing)
+	
+	var temp_y:= -gp.y + ss.y/2 - os.y
+	var new_y:= temp_y
+	
+	return Vector2(new_x,new_y)
+	
 	pass

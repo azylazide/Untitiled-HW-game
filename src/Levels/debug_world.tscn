@@ -59,6 +59,7 @@ script = ExtResource( 4 )
 [node name="CustomCam" type="Node2D" parent="."]
 script = ExtResource( 8 )
 player_path = NodePath("Player")
+smoothing = 0.202
 
 [node name="StaticBody2D" type="StaticBody2D" parent="CustomCam"]
 
