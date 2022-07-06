@@ -6,7 +6,10 @@ onready var player_node: ActorBase = get_node(player_path)
 onready var screen_size: Vector2 = get_viewport().get_visible_rect().size
 
 export(float) var x_offset_tiles = 0.8
-export(float,0,1) var smoothing = 0.8
+
+export(float,0,1) var IDLE_SMOOTHING = 0.2
+export(float,0,1) var WALK_SMOOTHING = 0.6
+export(float,0,1) var JUMP_SMOOTHING = 0.1
 
 onready var x_offset: float = x_offset_tiles*Globals.TILE_UNITS
 onready var current_offset:= Vector2(x_offset,0)
@@ -20,8 +23,6 @@ func _ready() -> void:
 	
 	#get current offset
 	var initial_face_dir: float = player_node.face_direction
-	current_offset = _check_face_dir(current_offset,initial_face_dir)
-	
 	
 	var initial_player_movement_state: int = player_node.current_movement_state
 	
@@ -30,8 +31,7 @@ func _ready() -> void:
 	canvas_transform.origin = _new_canvas_transform(canvas_transform.origin,
 													player_node.global_position,
 													screen_size,
-													current_offset,
-													smoothing,
+													initial_face_dir,
 													initial_player_movement_state)
 	
 	#apply camera
@@ -42,8 +42,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	#get current offset
 	var face_dir: float = player_node.face_direction
-	current_offset = _check_face_dir(current_offset,face_dir)
-	
+		
 	var player_movement_state: int = player_node.current_movement_state
 	
 	var canvas_transform: Transform2D = get_viewport().canvas_transform
@@ -51,8 +50,7 @@ func _physics_process(delta: float) -> void:
 	canvas_transform.origin = _new_canvas_transform(canvas_transform.origin,
 													player_node.global_position,
 													screen_size,
-													current_offset,
-													smoothing,
+													face_dir,
 													player_movement_state)
 	
 	#clamp cam at edges when in bounds
@@ -141,23 +139,73 @@ func on_CameraBBoxDetector_area_exited(area: Area2D):
 	print("exit")
 	pass
 
-func _check_face_dir(current_offset: Vector2, face_dir: float) -> Vector2:
+func _get_offset(current_offset: Vector2, face_dir: float, additional: Vector2 = Vector2.ZERO) -> Vector2:
 	if face_dir > 0:
-		return Vector2(x_offset,0)
+		return Vector2(x_offset+additional.x,additional.y)
 	elif face_dir < 0:
-		return -Vector2(x_offset,0)
+		return Vector2(-x_offset-additional.x,additional.y)
 	else:
 		return current_offset
 	
-func _new_canvas_transform(ct_o: Vector2, gp: Vector2, ss: Vector2, os: Vector2, 
-							smoothing: float, cs: int) -> Vector2:
-	#separate x,y
-	var temp_x:= -gp.x + ss.x/2 - os.x
-	var new_x: float = lerp(ct_o.x,temp_x,smoothing)
+func _new_canvas_transform(ct_o: Vector2, gp: Vector2, ss: Vector2, fc: float, 
+							cs: int) -> Vector2:
+	#separate x,y	
+	var temp:= -gp + ss/2
+	var new_x: float
+	var new_y: float
 	
-	var temp_y:= -gp.y + ss.y/2 - os.y
-	var new_y:= temp_y
+	if player_node.previous_movement_state < 0:
+		return temp
 	
+	match cs:
+		player_node.MOVEMENT_STATES.IDLE:
+			current_offset = _get_offset(current_offset,fc)
+			
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
+			new_y = lerp(ct_o.y,temp.y,0.1)
+			
+		player_node.MOVEMENT_STATES.WALK:
+			current_offset = _get_offset(current_offset,fc,Vector2(-3*Globals.TILE_UNITS,0))
+			
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
+			new_y = lerp(ct_o.y,temp.y,0.1)
+			
+		player_node.MOVEMENT_STATES.FALL:
+			if player_node.direction != 0:
+				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,-4.5*Globals.TILE_UNITS))
+				
+				new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
+			else:
+				current_offset = _get_offset(current_offset,fc,Vector2(0,-4.5*Globals.TILE_UNITS))
+				
+				new_x = lerp(ct_o.x,temp.x,0.01)
+				
+			new_y = lerp(ct_o.y,temp.y+current_offset.y,0.05)
+		player_node.MOVEMENT_STATES.JUMP:
+			if player_node.direction != 0:
+				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,1.5*Globals.TILE_UNITS))
+			else:
+				current_offset = _get_offset(current_offset,fc,Vector2(0,1.5*Globals.TILE_UNITS))
+			
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.05)
+			new_y = lerp(ct_o.y,temp.y+current_offset.y,0.1)
+		player_node.MOVEMENT_STATES.GDASH:
+			current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,0))
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
+			new_y = lerp(ct_o.y,temp.y,0.1)
+		player_node.MOVEMENT_STATES.ADASH:
+			current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,0))
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.1)
+			new_y = lerp(ct_o.y,temp.y,0.1)
+		player_node.MOVEMENT_STATES.WALL:
+			if player_node.velocity.y > 0:
+				current_offset = _get_offset(current_offset,fc,Vector2(3*Globals.TILE_UNITS,-1.5*Globals.TILE_UNITS))
+				new_y = lerp(ct_o.y,temp.y+current_offset.y,0.05)
+			else:
+				new_y = lerp(ct_o.y,temp.y,0.05)
+			
+			new_x = lerp(ct_o.x,temp.x+current_offset.x,0.05)
+		
 	return Vector2(new_x,new_y)
 	
 	pass
