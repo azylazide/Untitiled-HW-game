@@ -460,6 +460,9 @@ func _run_state(delta: float) -> void:
 				if not on_wall:
 					face_direction = sign(wall_normal.x)
 					change_movement_state(MOVEMENT_STATES.FALL)
+				
+				#if still on wall
+				face_direction = sign(wall_normal.x)
 	pass
 
 #-HELPER FUNCTIONS-
