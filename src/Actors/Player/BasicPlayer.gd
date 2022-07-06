@@ -269,7 +269,6 @@ func _initialize_state(delta: float) -> void:
 	pass
 
 func _run_state(delta: float) -> void:
-	_changing_state_flag = false
 	
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
@@ -468,9 +467,6 @@ func _run_state(delta: float) -> void:
 				
 				#if still on wall
 				face_direction = sign(wall_normal.x)
-	
-	if _changing_state_flag:
-		emit_signal("state_changed")
 
 #-HELPER FUNCTIONS-
 
