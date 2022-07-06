@@ -68,7 +68,7 @@ func _ready() -> void:
 	pass
 
 func _process(delta: float) -> void:
-	
+
 	#when intersecting
 	if not bbox_array.empty():
 		var left_array:= []
