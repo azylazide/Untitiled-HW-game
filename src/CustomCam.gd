@@ -158,10 +158,10 @@ func _interp_transform(old_transform: Transform2D, new_transform: Transform2D, c
 	if (player_node.previous_movement_state == player_node.MOVEMENT_STATES.WALL and
 		player_node.current_movement_state == player_node.MOVEMENT_STATES.JUMP):
 			horizontal_smoothing = 0.1 
-	#when moving and not wall jumping
+	#when slow moving and not wall jumping
 	else:
-		if player_node.velocity.x != 0:
-			horizontal_smoothing = 0.5
+		if abs(player_node.velocity.x) > player_node.speed*0.5:
+			horizontal_smoothing = 0.25
 	
 	
 	#vertical
