@@ -31,10 +31,18 @@ var player_speed: float
 var player_camera_center_pos: Vector2
 var movement_states
 
+var bounds = {"left":-bridge_inf,
+		"top":-bridge_inf,
+		"right":bridge_inf,
+		"bottom":bridge_inf}
+
+var detector_exited:= false
+
 func _ready() -> void:
 	#connect the detector to camera
 	player_node.camera_bbox_detector.connect("area_entered",self,"on_CameraBBoxDetector_area_entered")
 	player_node.camera_bbox_detector.connect("area_exited",self,"on_CameraBBoxDetector_area_exited")
+	player_node.camera_bbox_detector.connect("tree_exiting",self,"on_area_detector_exiting")
 	player_node.connect("player_updated",self,"_on_player_node_updated")
 	
 	player_facing = player_node.face_direction
@@ -138,8 +146,17 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		output.x = clamp(pos.x,temp_left+0.5*screen_size.x*zoom.x,temp_right-0.5*screen_size.x*zoom.x)
 		output.y = clamp(pos.y,temp_top+0.5*screen_size.y*zoom.y,temp_bottom-0.5*screen_size.y*zoom.y)
 		
+		bounds.left = temp_left
+		bounds.top = temp_top
+		bounds.right = temp_right
+		bounds.bottom = temp_bottom
+		
 #		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
 #				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])
+	
+	elif detector_exited:
+		output.x = clamp(pos.x,bounds.left+0.5*screen_size.x*zoom.x,bounds.right-0.5*screen_size.x*zoom.x)
+		output.y = clamp(pos.y,bounds.top+0.5*screen_size.y*zoom.y,bounds.bottom-0.5*screen_size.y*zoom.y)
 
 	else:
 		#set defaults
@@ -192,4 +209,7 @@ func _on_player_node_updated(facing: float, vel: Vector2, prev: int, current: in
 	current_state = current
 	player_camera_center_pos = cam_pos
 
-
+func on_area_detector_exiting() -> void:
+	print("area leaving")
+	detector_exited = true
+	pass
