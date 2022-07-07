@@ -81,16 +81,18 @@ monitorable = false
 modulate = Color( 0.764706, 0.764706, 0.764706, 1 )
 shape = SubResource( 2 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_left = -289.0
-margin_top = -139.0
-margin_right = -152.0
-margin_bottom = 1.0
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+margin_left = 11.0
+margin_top = 12.0
+margin_right = 148.0
+margin_bottom = 152.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_right = 137.0
 margin_bottom = 14.0
 text = "1"
@@ -98,7 +100,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label2" type="Label" parent="VBoxContainer"]
+[node name="Label2" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 18.0
 margin_right = 137.0
 margin_bottom = 32.0
@@ -107,7 +109,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label3" type="Label" parent="VBoxContainer"]
+[node name="Label3" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 36.0
 margin_right = 137.0
 margin_bottom = 50.0
@@ -116,7 +118,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label4" type="Label" parent="VBoxContainer"]
+[node name="Label4" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 54.0
 margin_right = 137.0
 margin_bottom = 68.0
@@ -125,7 +127,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label5" type="Label" parent="VBoxContainer"]
+[node name="Label5" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 72.0
 margin_right = 137.0
 margin_bottom = 86.0
@@ -134,7 +136,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label6" type="Label" parent="VBoxContainer"]
+[node name="Label6" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 137.0
 margin_bottom = 104.0
@@ -143,7 +145,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label7" type="Label" parent="VBoxContainer"]
+[node name="Label7" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 108.0
 margin_right = 137.0
 margin_bottom = 122.0
@@ -152,7 +154,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label8" type="Label" parent="VBoxContainer"]
+[node name="Label8" type="Label" parent="CanvasLayer/VBoxContainer"]
 margin_top = 126.0
 margin_right = 137.0
 margin_bottom = 140.0

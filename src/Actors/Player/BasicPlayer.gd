@@ -41,14 +41,14 @@ onready var auto_timer:= $Timers/AutoTimer
 onready var camera_bbox_detector = $CameraBBoxDetector
 onready var camera_center = $CameraCenter
 
-onready var debugtext1:= $VBoxContainer/Label
-onready var debugtext2:= $VBoxContainer/Label2
-onready var debugtext3:= $VBoxContainer/Label3
-onready var debugtext4:= $VBoxContainer/Label4
-onready var debugtext5:= $VBoxContainer/Label5
-onready var debugtext6:= $VBoxContainer/Label6
-onready var debugtext7:= $VBoxContainer/Label7  
-onready var debugtext8:= $VBoxContainer/Label8 
+onready var debugtext1:= $CanvasLayer/VBoxContainer/Label
+onready var debugtext2:= $CanvasLayer/VBoxContainer/Label2
+onready var debugtext3:= $CanvasLayer/VBoxContainer/Label3
+onready var debugtext4:= $CanvasLayer/VBoxContainer/Label4
+onready var debugtext5:= $CanvasLayer/VBoxContainer/Label5
+onready var debugtext6:= $CanvasLayer/VBoxContainer/Label6
+onready var debugtext7:= $CanvasLayer/VBoxContainer/Label7  
+onready var debugtext8:= $CanvasLayer/VBoxContainer/Label8 
 
 onready var jump_gravity = Globals._gravity(JUMP_HEIGHT,MAX_WALK_TILE,GAP_LENGTH)
 onready var fall_gravity = Globals._gravity(1.5*JUMP_HEIGHT,MAX_WALK_TILE,0.8*GAP_LENGTH)
