@@ -120,7 +120,7 @@ func _physics_process(delta: float) -> void:
 	_changing_state_flag = false
 	if previous_frame_movement_state != current_movement_state:
 		_enter_state(delta)
-	next_movement_state = (_initial_state(delta) if previous_movement_state == -1 
+	next_movement_state = (_initial_state(delta) if previous_frame_movement_state == -1 
 							else _run_state(delta))
 	if next_movement_state != current_movement_state:
 		_exit_state(delta,current_movement_state)

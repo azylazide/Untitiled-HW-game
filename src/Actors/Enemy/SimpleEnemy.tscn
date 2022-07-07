@@ -9,7 +9,6 @@ extents = Vector2( 49, 45 )
 
 [node name="SimpleEnemy" type="KinematicBody2D"]
 collision_layer = 2
-collision_mask = 3
 script = ExtResource( 2 )
 actor_stats = ExtResource( 3 )
 current_movement_state = 1
@@ -21,3 +20,28 @@ shape = SubResource( 1 )
 position = Vector2( 2.86102e-06, -2.86102e-06 )
 scale = Vector2( 1.5, 1.5 )
 texture = ExtResource( 1 )
+
+[node name="EdgeDetectors" type="Position2D" parent="."]
+position = Vector2( 0, 48 )
+
+[node name="RightEdge" type="RayCast2D" parent="EdgeDetectors"]
+position = Vector2( 56, -8 )
+enabled = true
+cast_to = Vector2( 0, 16 )
+
+[node name="LeftEdge" type="RayCast2D" parent="EdgeDetectors"]
+position = Vector2( -56, -8 )
+enabled = true
+cast_to = Vector2( 0, 16 )
+
+[node name="WallDetectors" type="Position2D" parent="."]
+
+[node name="RightWall" type="RayCast2D" parent="WallDetectors"]
+position = Vector2( 48, 0 )
+enabled = true
+cast_to = Vector2( 16, 0 )
+
+[node name="LeftWall" type="RayCast2D" parent="WallDetectors"]
+position = Vector2( -48, 0 )
+enabled = true
+cast_to = Vector2( -16, 0 )

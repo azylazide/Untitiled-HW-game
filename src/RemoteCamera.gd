@@ -60,6 +60,7 @@ func _ready() -> void:
 
 	pass
 
+
 func _physics_process(delta: float) -> void:
 	#get new position
 	var new_position:= _update_position()
@@ -83,6 +84,7 @@ func _get_offset() -> Vector2:
 	elif face_dir < 0:
 		output.x = -x_offset
 	return output
+
 
 func _clamp_position(pos: Vector2) -> Vector2:
 	var output: Vector2
@@ -165,6 +167,7 @@ func _clamp_position(pos: Vector2) -> Vector2:
 
 	return output
 
+
 func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	
 	var output: Vector2
@@ -193,14 +196,17 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	
 	return output
 
+
 #might be a problem when detectors fire before camera is ready
 func on_CameraBBoxDetector_area_entered(area: Area2D):
 	bbox_array.append(area)
 	pass
 
+
 func on_CameraBBoxDetector_area_exited(area: Area2D):
 	bbox_array.erase(area)
 	pass
+
 
 func _on_player_node_updated(facing: float, vel: Vector2, prev: int, current: int, cam_pos: Vector2):
 	player_facing = facing
@@ -208,6 +214,7 @@ func _on_player_node_updated(facing: float, vel: Vector2, prev: int, current: in
 	prev_state = prev
 	current_state = current
 	player_camera_center_pos = cam_pos
+
 
 func on_area_detector_exiting() -> void:
 	print("area leaving")
