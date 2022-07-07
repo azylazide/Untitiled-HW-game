@@ -164,6 +164,10 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		#set defaults
 		output.x = clamp(pos.x,left_limit+0.5*screen_size.x*zoom.x,right_limit-0.5*screen_size.x*zoom.x)
 		output.y = clamp(pos.y,top_limit+0.5*screen_size.y*zoom.y,bottom_limit-0.5*screen_size.y*zoom.y)
+		bounds.left = left_limit
+		bounds.top = top_limit
+		bounds.right = right_limit
+		bounds.bottom = bottom_limit
 
 	return output
 

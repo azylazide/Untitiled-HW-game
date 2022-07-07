@@ -18,9 +18,13 @@ var direction: float
 var face_direction: float
 var jump_force: float
 
+signal death()
+
 func _process(delta: float) -> void:
-#	health = actor_stats.health
-#	print(health)
+	if actor_stats.health == 0:
+		emit_signal("death")
+		#replace with logic to tell the inherited classes to die
+		queue_free()
 	pass
 
 func damage(amount: float) -> void:

@@ -77,6 +77,9 @@ var _changing_state_flag:= false
 
 
 func _ready() -> void:
+	add_to_group("Player")
+	
+	
 	jump_force = Globals._jump_vel(MAX_WALK_TILE,JUMP_HEIGHT,GAP_LENGTH)
 	min_jump_force = Globals._jump_vel(MAX_WALK_TILE,MIN_JUMP_HEIGHT,GAP_LENGTH/2.0)
 	wall_kick_force = Globals._wall_kick(WALL_KICK_POWER,WALL_KICK_TIME)

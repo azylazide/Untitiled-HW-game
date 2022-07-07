@@ -89,8 +89,11 @@ position = Vector2( -544, 352 )
 position = Vector2( 544, 160 )
 move_to_pos = Vector2( 0, -25 )
 
-[node name="ActorBase" parent="DebugLevel" instance=ExtResource( 7 )]
+[node name="Enemy1" parent="DebugLevel" instance=ExtResource( 7 )]
 position = Vector2( 80, 464 )
+
+[node name="Enemy2" parent="DebugLevel" instance=ExtResource( 7 )]
+position = Vector2( 2272, 272 )
 
 [node name="CameraBBoxes" type="Node2D" parent="DebugLevel"]
 

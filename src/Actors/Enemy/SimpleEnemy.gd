@@ -18,13 +18,30 @@ onready var right_edge_detector: RayCast2D = $EdgeDetectors/RightEdge
 onready var left_wall_detector: RayCast2D = $WallDetectors/LeftWall
 onready var right_wall_detector: RayCast2D = $WallDetectors/RightWall
 
+onready var gravity:= 15*Globals.TILE_UNITS
+
+onready var debug_label:= $VBoxContainer/Label
+
 func _ready() -> void:
+	
+	add_to_group("Enemies")
+	
 	direction = 1
 	speed = MAX_WALK_TILE*Globals.TILE_UNITS
 	pass
 
 
 func _physics_process(delta: float) -> void:
+	right_wall_detector.force_raycast_update()
+	left_wall_detector.force_raycast_update()
+	right_edge_detector.force_raycast_update()
+	left_edge_detector.force_raycast_update()
+	
+	debug_label.text = "LW: %s RW: %s\nLE: %s RE: %s" %[left_wall_detector.is_colliding(),
+		right_wall_detector.is_colliding(),
+		left_edge_detector.is_colliding(),
+		right_edge_detector.is_colliding()]
+	
 	if direction > 0:
 		if right_wall_detector.is_colliding():
 			direction = -1
@@ -53,6 +70,7 @@ func _initial_state(delta: float) -> int:
 			return MOVEMENT_STATES.IDLE
 		MOVEMENT_STATES.WALK:
 			velocity.x = speed*direction
+			_apply_gravity(delta)
 			velocity = move_and_slide(velocity,Vector2.UP)
 			return MOVEMENT_STATES.WALK
 	return -1
@@ -63,7 +81,8 @@ func _run_state(delta: float) -> int:
 			MOVEMENT_STATES.IDLE:
 				return MOVEMENT_STATES.IDLE
 			MOVEMENT_STATES.WALK:
-				velocity.x = speed*direction
+				velocity.x = lerp(velocity.x,speed*direction,0.05)
+				_apply_gravity(delta)
 				velocity = move_and_slide(velocity,Vector2.UP)
 				return MOVEMENT_STATES.WALK
 	return -1
@@ -79,3 +98,7 @@ func change_movement_state(next_state: int) -> void:
 	
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
+
+
+func _apply_gravity(delta: float) -> void:
+	velocity.y += gravity*delta
