@@ -116,16 +116,16 @@ func _clamp_position(pos: Vector2) -> Vector2:
 					temp_bottom = bottom_array[i]
 
 		#set temp limit as limit
-		output.x = clamp(pos.x,temp_left+screen_size.x/2,temp_right-screen_size.x/2)
-		output.y = clamp(pos.y,temp_top+screen_size.y/2,temp_bottom-screen_size.y/2)
+		output.x = clamp(pos.x,temp_left+0.5*screen_size.x*zoom.x,temp_right-0.5*screen_size.x*zoom.x)
+		output.y = clamp(pos.y,temp_top+0.5*screen_size.y*zoom.y,temp_bottom-0.5*screen_size.y*zoom.y)
 		
 #		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
 #				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])
 
 	else:
 		#set defaults
-		output.x = clamp(pos.x,left_limit+screen_size.x/2,right_limit+screen_size.x/2)
-		output.y = clamp(pos.y,top_limit+screen_size.y/2,bottom_limit-screen_size.y/2)
+		output.x = clamp(pos.x,left_limit+0.5*screen_size.x*zoom.x,right_limit-0.5*screen_size.x*zoom.x)
+		output.y = clamp(pos.y,top_limit+0.5*screen_size.y*zoom.y,bottom_limit-0.5*screen_size.y*zoom.y)
 
 	return output
 
@@ -152,8 +152,8 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	if player_node.current_movement_state == player_node.MOVEMENT_STATES.FALL:
 		vs = vertical_fast_smoothing
 		
-	output.x = lerp(global_position.x,clamped_pos.x,hs)
-	output.y = lerp(global_position.y,clamped_pos.y,hs)
+	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
+	output.y = lerp(global_position.y,clamped_pos.y,hs/zoom.y)
 	
 	return output
 

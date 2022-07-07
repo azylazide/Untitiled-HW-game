@@ -221,7 +221,6 @@ shape = SubResource( 8 )
 
 [node name="NewCamera" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 2, 2 )
 process_mode = 0
 script = ExtResource( 9 )
 player_path = NodePath("../Player")
