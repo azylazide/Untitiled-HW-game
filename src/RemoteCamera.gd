@@ -23,14 +23,32 @@ var player_camera_center: Position2D
 var bbox_array = []
 var bridge_inf:= 10000000
 
+var player_facing: float
+var prev_state: int
+var current_state: int
+var player_velocity: Vector2
+var player_speed: float
+var player_camera_center_pos: Vector2
+var movement_states
+
 func _ready() -> void:
 	#connect the detector to camera
 	player_node.camera_bbox_detector.connect("area_entered",self,"on_CameraBBoxDetector_area_entered")
 	player_node.camera_bbox_detector.connect("area_exited",self,"on_CameraBBoxDetector_area_exited")
+	player_node.connect("player_updated",self,"_on_player_node_updated")
+	
+	player_facing = player_node.face_direction
+	prev_state = player_node.previous_movement_state
+	current_state = player_node.current_movement_state
+	player_velocity = player_node.velocity
+	player_speed = player_node.speed
 	player_camera_center = player_node.camera_center
+	player_camera_center_pos = player_camera_center.global_position
+	movement_states = player_node.MOVEMENT_STATES
 	
 	#set initial position
 	global_position = _update_position()
+
 
 	pass
 
@@ -46,10 +64,11 @@ func _physics_process(delta: float) -> void:
 
 func _update_position() -> Vector2:
 	current_offset = _get_offset()
-	return player_camera_center.global_position + current_offset
+	return player_camera_center_pos + current_offset
+
 
 func _get_offset() -> Vector2:
-	var face_dir: float = player_node.face_direction
+	var face_dir: float = player_facing
 	var output:= current_offset
 	if face_dir > 0:
 		output.x = x_offset
@@ -138,18 +157,18 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	#TODO: when player is too far from camera
 	
 	#when wall jumping
-	if (player_node.previous_movement_state == player_node.MOVEMENT_STATES.WALL and
-		player_node.current_movement_state == player_node.MOVEMENT_STATES.JUMP):
+	if (prev_state == movement_states.WALL and
+		current_state == movement_states.JUMP):
 			hs = wall_jump_smoothing
 	#when slow moving and not wall jumping
 	else:
-		if abs(player_node.velocity.x) > player_node.speed*0.5:
+		if abs(player_velocity.x) > player_speed*0.5:
 			hs = horizontal_fast_smoothing
 	
 	#vertical
 	var vs: float = vertical_slow_smoothing
 	#when falling
-	if player_node.current_movement_state == player_node.MOVEMENT_STATES.FALL:
+	if current_state == movement_states.FALL:
 		vs = vertical_fast_smoothing
 		
 	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
@@ -165,5 +184,12 @@ func on_CameraBBoxDetector_area_entered(area: Area2D):
 func on_CameraBBoxDetector_area_exited(area: Area2D):
 	bbox_array.erase(area)
 	pass
+
+func _on_player_node_updated(facing: float, vel: Vector2, prev: int, current: int, cam_pos: Vector2):
+	player_facing = facing
+	player_velocity = vel
+	prev_state = prev
+	current_state = current
+	player_camera_center_pos = cam_pos
 
 

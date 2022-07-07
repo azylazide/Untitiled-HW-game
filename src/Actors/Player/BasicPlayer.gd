@@ -72,6 +72,7 @@ var previous_frame_movement_state:= -1
 var previous_action_state:= -1
 
 signal state_changed()
+signal player_updated()
 var _changing_state_flag:= false
 
 
@@ -124,6 +125,13 @@ func _physics_process(delta: float) -> void:
 	if next_movement_state != current_movement_state:
 		_exit_state(delta,current_movement_state)
 	change_movement_state(next_movement_state)
+
+	emit_signal("player_updated",
+				face_direction,
+				velocity,
+				previous_movement_state,
+				current_movement_state,
+				camera_center.global_position)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -578,6 +586,7 @@ func change_movement_state(next_state: int) -> void:
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
 	_changing_state_flag = true
+	emit_signal("state_changed",next_state)
 
 #record previous state and change current state
 func change_action_state(next_state: int) -> void:
