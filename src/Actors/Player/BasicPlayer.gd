@@ -38,9 +38,8 @@ onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
 
 onready var auto_timer:= $Timers/AutoTimer
 
-onready var camera = $PlayerCamera
-
 onready var camera_bbox_detector = $CameraBBoxDetector
+onready var camera_center = $CameraCenter
 
 onready var debugtext1:= $VBoxContainer/Label
 onready var debugtext2:= $VBoxContainer/Label2

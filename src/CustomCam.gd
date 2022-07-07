@@ -20,6 +20,7 @@ var bbox_array = []
 var bridge_inf:= 10000000
 
 func _ready() -> void:
+	return
 	#connect the detector to camera
 	player_node.camera_bbox_detector.connect("area_entered",self,"on_CameraBBoxDetector_area_entered")
 	player_node.camera_bbox_detector.connect("area_exited",self,"on_CameraBBoxDetector_area_exited")
@@ -33,7 +34,7 @@ func _ready() -> void:
 	pass
 
 func _physics_process(delta: float) -> void:
-
+	return
 	var canvas_transform: Transform2D = get_viewport().canvas_transform
 	var new_transform:= _update_transform(canvas_transform)
 	#clamp cam at edges when in bounds

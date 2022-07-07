@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://src/Actors/Player/BasicPlayer.gd" type="Script" id=1]
 [ext_resource path="res://src/Actors/Player/Resources/PlayerResource.tres" type="Resource" id=2]
-[ext_resource path="res://src/Actors/Player/PlayerCamera.gd" type="Script" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 25, 60 )
@@ -70,14 +69,7 @@ enabled = true
 cast_to = Vector2( 30, 0 )
 
 [node name="CameraCenter" type="Position2D" parent="."]
-position = Vector2( 64, -64 )
-
-[node name="PlayerCamera" type="Camera2D" parent="."]
-position = Vector2( 0, -61 )
-limit_smoothed = true
-smoothing_enabled = true
-smoothing_speed = 10.0
-script = ExtResource( 3 )
+position = Vector2( 0, -64 )
 
 [node name="CameraBBoxDetector" type="Area2D" parent="."]
 position = Vector2( 0, -60 )
@@ -168,6 +160,3 @@ text = "1"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[connection signal="area_entered" from="CameraBBoxDetector" to="PlayerCamera" method="_on_CameraBBoxDetector_area_entered"]
-[connection signal="area_exited" from="CameraBBoxDetector" to="PlayerCamera" method="_on_CameraBBoxDetector_area_exited"]
