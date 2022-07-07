@@ -8,9 +8,9 @@ export(float) var down_bias_tiles = 0.8
 
 export(float,0,1) var horizontal_slow_smoothing = 0.1
 export(float,0,1) var wall_jump_smoothing = 0.1
-export(float,0,1) var horizontal_fast_smoothing = 0.25
+export(float,0,1) var horizontal_fast_smoothing = 0.15
 export(float,0,1) var vertical_slow_smoothing = 0.1
-export(float,0,1) var vertical_fast_smoothing = 0.95
+export(float,0,1) var vertical_fast_smoothing = 0.4
 
 onready var x_offset: float = x_offset_tiles*Globals.TILE_UNITS
 onready var down_offset: float = down_bias_tiles*Globals.TILE_UNITS
@@ -153,7 +153,7 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 		vs = vertical_fast_smoothing
 		
 	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
-	output.y = lerp(global_position.y,clamped_pos.y,hs/zoom.y)
+	output.y = lerp(global_position.y,clamped_pos.y,vs/zoom.y)
 	
 	return output
 

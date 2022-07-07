@@ -27,12 +27,17 @@ _global_script_classes=[ {
 "base": "Node2D",
 "class": "CustomCam",
 "language": "GDScript",
-"path": "res://src/CustomCam.gd"
+"path": "res://misc/CustomCam.gd"
 }, {
 "base": "ActorResource",
 "class": "EnemyResource",
 "language": "GDScript",
 "path": "res://src/Actors/Enemy/Resources/EnemyResource.gd"
+}, {
+"base": "Node",
+"class": "GameManager",
+"language": "GDScript",
+"path": "res://src/Main/GameManager.gd"
 }, {
 "base": "ActorResource",
 "class": "PlayerResource",
@@ -65,6 +70,7 @@ _global_script_class_icons={
 "CameraBoundBox": "",
 "CustomCam": "",
 "EnemyResource": "",
+"GameManager": "",
 "PlayerResource": "",
 "PlayerStats": "",
 "State": "",

@@ -98,8 +98,7 @@ func _ready() -> void:
 	
 	on_floor = check_floor()
 
-func _physics_process(delta: float) -> void:
-	
+func _debug_text() -> void:
 	debugtext1.text = "velocity: " + str(velocity) + "\nposition: " + str(global_position)
 	debugtext2.text = "coyote: " + ("on" if not coyote_timer.is_stopped() else "off")
 	debugtext3.text = "is on floor: " + str(on_floor) + "\nwas on floor: " + str(was_on_floor)
@@ -108,6 +107,9 @@ func _physics_process(delta: float) -> void:
 	debugtext6.text = "on wall: " + str(on_wall)
 	debugtext7.text = "can ajump: " + str(can_ajump) + "\ncan adash: " + str(can_adash)
 	debugtext8.text = "Health: " + str(actor_stats.health)
+
+func _physics_process(delta: float) -> void:
+	_debug_text()
 	
 	#initial state at spawn
 	if previous_movement_state < 0:
@@ -467,6 +469,12 @@ func _run_state(delta: float) -> void:
 				#if still on wall
 				face_direction = sign(wall_normal.x)
 
+func _run_state_2(delta: float) -> int:
+	return 0
+
+func _transition_state(new_state: int) -> void:
+	return
+
 #-HELPER FUNCTIONS-
 
 #reset variables when landing
@@ -476,6 +484,9 @@ func _ground_reset() -> void:
 
 #record previous state and change current state
 func change_movement_state(next_state: int) -> void:
+	if next_state == current_movement_state:
+		return
+	
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
 	_changing_state_flag = true
