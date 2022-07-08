@@ -18,7 +18,7 @@ export(int, -1,1) var INITIAL_DIRECTION:= 1
 enum MOVEMENT_STATES {IDLE,WALK,FALL,JUMP,GDASH,ADASH,WALL}
 export(MOVEMENT_STATES) var current_movement_state = MOVEMENT_STATES.IDLE
 
-enum ACTION_STATES {NEUTRAL,ATTACK,DEAD}
+enum ACTION_STATES {NEUTRAL,ATTACK,STAGGER,DEAD}
 export(ACTION_STATES) var current_action_state = ACTION_STATES.NEUTRAL
 
 onready var floor_cast:= $RayCast2D
@@ -70,10 +70,12 @@ var previous_movement_state:= -1
 var next_movement_state:= -1
 var previous_frame_movement_state:= -1
 var previous_action_state:= -1
+var next_action_state:= -1
+var previous_frame_action_state:= -1
 
-signal state_changed()
+signal movement_changed()
+signal action_changed()
 signal player_updated()
-var _changing_state_flag:= false
 
 
 func _ready() -> void:
@@ -107,11 +109,12 @@ func _ready() -> void:
 
 
 func _debug_text() -> void:
-	debugtext1.text = "velocity: " + str(velocity) + "\nposition: " + str(global_position)
+	debugtext1.text = "velocity: (%f,%f)" %[velocity.x,velocity.y] + "\nposition: (%f,%f)" %[global_position.x,global_position.y]
 	debugtext2.text = "coyote: " + ("on" if not coyote_timer.is_stopped() else "off")
 	debugtext3.text = "is on floor: " + str(on_floor) + "\nwas on floor: " + str(was_on_floor)
 	debugtext4.text = "face dir: " + ("left" if face_direction < 0 else "right")
-	debugtext5.text = "prev state: " + str(previous_movement_state) + "\ncurrent state: " + str(current_movement_state)+ "\n(next %d)" %next_movement_state
+	debugtext5.text = ("MOVEMENT STATES\nprev state: %d\ncurrent state: %d\n(next: %d)\nACTION STATES\nprev state: %d\ncurrent state: %d\n(next %d)" 
+						%[previous_movement_state,current_movement_state,next_movement_state,previous_action_state,current_action_state,next_action_state])
 	debugtext6.text = "on wall: " + str(on_wall)
 	debugtext7.text = "can ajump: " + str(can_ajump) + "\ncan adash: " + str(can_adash)
 	debugtext8.text = "Health: " + str(actor_stats.health)
@@ -120,14 +123,23 @@ func _debug_text() -> void:
 func _physics_process(delta: float) -> void:
 	_debug_text()
 
-	_changing_state_flag = false
+	#MOVEMENT STATEMACHINE
 	if previous_frame_movement_state != current_movement_state:
-		_enter_state(delta)
-	next_movement_state = (_initial_state(delta) if previous_frame_movement_state == -1 
-							else _run_state(delta))
+		_enter_movement_state(delta)
+	next_movement_state = (_initial_movement_state(delta) if previous_frame_movement_state == -1 
+							else _run_movement_state(delta))
 	if next_movement_state != current_movement_state:
-		_exit_state(delta,current_movement_state)
+		_exit_movement_state(delta,current_movement_state)
 	change_movement_state(next_movement_state)
+	
+	#ACTION STATEMACHINE
+	if previous_frame_action_state != current_action_state:
+		_enter_action_state(delta)
+	next_action_state = (_initial_action_state(delta) if previous_frame_action_state == -1 
+							else _run_action_state(delta))
+	if next_action_state != current_action_state:
+		_exit_action_state(delta,current_action_state)
+	change_action_state(next_action_state)
 
 	emit_signal("player_updated",
 				face_direction,
@@ -195,9 +207,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("dash"):
 					face_direction = sign(wall_normal.x)
 					change_movement_state(MOVEMENT_STATES.ADASH)
+		
+		match current_action_state:
+			ACTION_STATES.NEUTRAL:
+				if event.is_action_pressed("attack"):
+					print("will attack")
+					change_action_state(ACTION_STATES.ATTACK)
 
-
-func _enter_state(delta: float) -> void:
+func _enter_movement_state(delta: float) -> void:
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
@@ -239,7 +256,10 @@ func _enter_state(delta: float) -> void:
 				return
 
 
-func _initial_state(delta: float) -> int:
+func _enter_action_state(delta: float) -> void:
+	pass
+
+func _initial_movement_state(delta: float) -> int:
 	
 	match current_movement_state:
 		#when idle
@@ -352,7 +372,10 @@ func _initial_state(delta: float) -> int:
 	return -2
 
 
-func _run_state(delta: float) -> int:
+func _initial_action_state(delta: float) -> int:
+	return ACTION_STATES.NEUTRAL
+
+func _run_movement_state(delta: float) -> int:
 
 	if current_action_state != ACTION_STATES.DEAD:
 		match current_movement_state:
@@ -567,8 +590,24 @@ func _run_state(delta: float) -> int:
 	#TODO add "ragdoll" when dead
 	return -2
 
+func _run_action_state(delta: float) -> int:
+	match current_action_state:
+		ACTION_STATES.NEUTRAL:
+			return ACTION_STATES.NEUTRAL
+		ACTION_STATES.ATTACK:
+			print("attacking")
+			print("attack ended")
+			return ACTION_STATES.NEUTRAL
+		ACTION_STATES.STAGGER:
+			return ACTION_STATES.NEUTRAL
+		ACTION_STATES.DEAD:
+			return ACTION_STATES.NEUTRAL
+	return -2
 
-func _exit_state(delta: float, current: int) -> void:
+func _exit_action_state(delta: float, current: int) -> void:
+	pass
+
+func _exit_movement_state(delta: float, current: int) -> void:
 	pass
 
 
@@ -588,13 +627,18 @@ func change_movement_state(next_state: int) -> void:
 	
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
-	_changing_state_flag = true
-	emit_signal("state_changed",next_state)
+	emit_signal("movement_changed",next_state)
 
 #record previous state and change current state
 func change_action_state(next_state: int) -> void:
+	previous_frame_action_state = current_action_state
+	
+	if next_state == current_action_state:
+		return
+	
 	previous_action_state = current_action_state
 	current_action_state = next_state
+	emit_signal("action_changed",next_state)
 
 
 #check previous state before jump

@@ -73,7 +73,7 @@ func _initial_state(delta: float) -> int:
 		MOVEMENT_STATES.WALK:
 			velocity.x = speed*direction
 			_apply_gravity(delta)
-			velocity = move_and_slide(velocity,Vector2.UP)
+			velocity = move_and_slide_with_snap(velocity,Vector2.DOWN*50,Vector2.UP)
 			return MOVEMENT_STATES.WALK
 	return -1
 
@@ -85,7 +85,7 @@ func _run_state(delta: float) -> int:
 			MOVEMENT_STATES.WALK:
 				velocity.x = lerp(velocity.x,speed*direction,0.05)
 				_apply_gravity(delta)
-				velocity = move_and_slide(velocity,Vector2.UP)
+				velocity = move_and_slide_with_snap(velocity,Vector2.DOWN*50,Vector2.UP)
 				return MOVEMENT_STATES.WALK
 	return -1
 
