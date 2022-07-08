@@ -26,7 +26,6 @@ func _process(delta: float) -> void:
 		#replace with logic to tell the inherited classes to die
 		print("actor: %s died" %name)
 		self.queue_free()
-	pass
 
 func damage(amount: float) -> void:
 	actor_stats.health -= amount

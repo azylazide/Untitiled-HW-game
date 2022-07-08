@@ -148,8 +148,10 @@ func _physics_process(delta: float) -> void:
 	#debug sprite
 	if face_direction > 0:
 		sprite.flip_h = false
+		arrow_spawn_point.position.x = abs(arrow_spawn_point.position.x)
 	elif face_direction < 0:
 		sprite.flip_h = true
+		arrow_spawn_point.position.x = -abs(arrow_spawn_point.position.x)
 
 	emit_signal("player_updated",
 				face_direction,
@@ -604,7 +606,7 @@ func _run_action_state(delta: float) -> int:
 		ACTION_STATES.NEUTRAL:
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.ATTACK:
-			emit_signal("arrow_spawned",arrow_spawn_point.global_position)
+			emit_signal("arrow_spawned",arrow_spawn_point,face_direction)
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.STAGGER:
 			return ACTION_STATES.NEUTRAL
