@@ -62,7 +62,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "WorldManager",
 "language": "GDScript",
-"path": "res://src/Levels/world_manager.gd"
+"path": "res://src/Main/WorldManager.gd"
 } ]
 _global_script_class_icons={
 "ActorBase": "",
@@ -81,7 +81,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Untitiled Huntress Wizard Game"
-run/main_scene="res://src/Levels/debug_world.tscn"
+run/main_scene="res://src/Levels/DebugWorld/DebugWorld.tscn"
 config/icon="res://icon.png"
 
 [autoload]

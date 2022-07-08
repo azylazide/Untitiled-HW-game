@@ -7,6 +7,8 @@ export(MOVEMENT_STATES) var current_movement_state = MOVEMENT_STATES.IDLE
 enum ACTION_STATES {NEUTRAL,ATTACK,DEAD}
 export(ACTION_STATES) var current_action_state = ACTION_STATES.NEUTRAL
 
+export(float,-1,1) var initial_direction = 1
+
 var previous_movement_state:= -1
 var previous_action_state:= -1
 var previous_frame_movement_state:= -1
@@ -26,7 +28,7 @@ func _ready() -> void:
 	
 	add_to_group("Enemies")
 	
-	direction = 1
+	direction = initial_direction
 	speed = MAX_WALK_TILE*Globals.TILE_UNITS
 	pass
 

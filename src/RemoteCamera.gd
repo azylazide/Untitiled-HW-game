@@ -43,6 +43,7 @@ func _ready() -> void:
 	player_node.camera_bbox_detector.connect("area_entered",self,"on_CameraBBoxDetector_area_entered")
 	player_node.camera_bbox_detector.connect("area_exited",self,"on_CameraBBoxDetector_area_exited")
 	player_node.camera_bbox_detector.connect("tree_exiting",self,"on_area_detector_exiting")
+	#connect player physics updates
 	player_node.connect("player_updated",self,"_on_player_node_updated")
 	
 	player_facing = player_node.face_direction
@@ -221,6 +222,5 @@ func _on_player_node_updated(facing: float, vel: Vector2, prev: int, current: in
 
 
 func on_area_detector_exiting() -> void:
-	print("area leaving")
 	detector_exited = true
 	pass

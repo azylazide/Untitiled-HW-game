@@ -17,4 +17,4 @@ func spawn_arrow(pos) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept"):
 		var player = $Player
-		player.damage(50)
+		player.heal(50)

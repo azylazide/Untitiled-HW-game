@@ -15,6 +15,7 @@ radius = 64.0
 collision_layer = 2
 script = ExtResource( 2 )
 actor_stats = ExtResource( 3 )
+MAX_WALK_TILE = 4.0
 current_movement_state = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
