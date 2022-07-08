@@ -2,7 +2,7 @@
 
 [ext_resource path="res://src/Actors/Player/BasicPlayer.gd" type="Script" id=1]
 [ext_resource path="res://src/Actors/Player/Resources/PlayerResource.tres" type="Resource" id=2]
-[ext_resource path="res://src/Actors/Player/Hitbox.gd" type="Script" id=3]
+[ext_resource path="res://src/Props/HitHurtBoxes/HitBox.tscn" type="PackedScene" id=3]
 [ext_resource path="res://assets/temp_idle_hw.png" type="Texture" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -12,7 +12,7 @@ extents = Vector2( 25, 60 )
 radius = 72.111
 
 [sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 26.5, 62 )
+extents = Vector2( 16.5, 62.5 )
 
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 6
@@ -169,21 +169,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HitBox" type="Area2D" parent="."]
-position = Vector2( 0, -61 )
-collision_layer = 4
-collision_mask = 0
-script = ExtResource( 3 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
-shape = SubResource( 3 )
-
-[node name="Cooldown" type="Timer" parent="HitBox"]
-process_mode = 0
-wait_time = 1.2
-one_shot = true
-
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( -2.38419e-07, -70.4162 )
 scale = Vector2( 0.233232, 0.233232 )
 texture = ExtResource( 4 )
+
+[node name="ArrowSpawnPoint" type="Position2D" parent="."]
+position = Vector2( 44, -72 )
+__meta__ = {
+"_gizmo_extents_": 6.9
+}
+
+[node name="HitBox" parent="." instance=ExtResource( 3 )]
+position = Vector2( 0, -63 )
+collision_layer = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2( 0.5, 0.5 )
+shape = SubResource( 3 )

@@ -7,7 +7,7 @@
 length = 64.0
 
 [node name="Arrow" type="Area2D"]
-collision_layer = 4
+collision_layer = 8
 collision_mask = 3
 script = ExtResource( 1 )
 
@@ -20,4 +20,5 @@ position = Vector2( 33.7116, -0.0555184 )
 scale = Vector2( 0.520733, 0.520733 )
 texture = ExtResource( 2 )
 
+[connection signal="area_entered" from="." to="." method="_on_Arrow_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_Arrow_body_entered"]

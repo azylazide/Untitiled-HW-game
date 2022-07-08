@@ -39,10 +39,11 @@ func _physics_process(delta: float) -> void:
 	right_edge_detector.force_raycast_update()
 	left_edge_detector.force_raycast_update()
 	
-	debug_label.text = "LW: %s RW: %s\nLE: %s RE: %s" %[left_wall_detector.is_colliding(),
+	debug_label.text = "LW: %s RW: %s\nLE: %s RE: %s\nHealth: %s" %[left_wall_detector.is_colliding(),
 		right_wall_detector.is_colliding(),
 		left_edge_detector.is_colliding(),
-		right_edge_detector.is_colliding()]
+		right_edge_detector.is_colliding(),
+		actor_stats.health]
 	
 	if direction > 0:
 		if right_wall_detector.is_colliding():

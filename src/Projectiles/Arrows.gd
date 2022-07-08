@@ -10,7 +10,15 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	position += velocity*delta
 
-
+#collided with body
 func _on_Arrow_body_entered(body: Node) -> void:
 	queue_free()
-	pass # Replace with function body.
+
+#entered a hitbox
+func _on_Arrow_area_entered(area: Area2D) -> void:
+	if area.owner.is_in_group("Enemies"):
+		print(area.owner)
+		area.apply_damage(50)
+		queue_free()
+
+

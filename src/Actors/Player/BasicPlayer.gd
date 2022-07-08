@@ -60,6 +60,7 @@ onready var can_ajump:= true
 onready var wall_normal:= Vector2.ZERO
 
 onready var sprite:= $Sprite
+onready var arrow_spawn_point:= $ArrowSpawnPoint
 
 var on_floor: bool
 var on_wall: bool
@@ -78,6 +79,7 @@ var previous_frame_action_state:= -1
 signal movement_changed()
 signal action_changed()
 signal player_updated()
+signal arrow_spawned()
 
 
 func _ready() -> void:
@@ -219,7 +221,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		match current_action_state:
 			ACTION_STATES.NEUTRAL:
 				if event.is_action_pressed("attack"):
-					print("will attack")
 					change_action_state(ACTION_STATES.ATTACK)
 
 func _enter_movement_state(delta: float) -> void:
@@ -603,8 +604,7 @@ func _run_action_state(delta: float) -> int:
 		ACTION_STATES.NEUTRAL:
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.ATTACK:
-			print("attacking")
-			print("attack ended")
+			emit_signal("arrow_spawned",arrow_spawn_point.global_position)
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.STAGGER:
 			return ACTION_STATES.NEUTRAL
