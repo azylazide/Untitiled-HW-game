@@ -110,6 +110,7 @@ position = Vector2( -560, -24 )
 position = Vector2( 1304, -240 )
 
 [node name="CameraBBoxes" type="Node2D" parent="."]
+modulate = Color( 0.670588, 1, 0.760784, 1 )
 
 [node name="CameraBoundBox" type="Area2D" parent="CameraBBoxes"]
 position = Vector2( 2306, -96 )
@@ -255,6 +256,7 @@ shape = SubResource( 10 )
 
 [node name="NewCamera" type="Camera2D" parent="."]
 current = true
+zoom = Vector2( 0.8, 0.8 )
 process_mode = 0
 script = ExtResource( 2 )
 player_path = NodePath("../Player")

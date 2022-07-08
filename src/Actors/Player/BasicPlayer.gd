@@ -59,6 +59,8 @@ onready var can_ajump:= true
 
 onready var wall_normal:= Vector2.ZERO
 
+onready var sprite:= $Sprite
+
 var on_floor: bool
 var on_wall: bool
 
@@ -140,6 +142,12 @@ func _physics_process(delta: float) -> void:
 	if next_action_state != current_action_state:
 		_exit_action_state(delta,current_action_state)
 	change_action_state(next_action_state)
+
+	#debug sprite
+	if face_direction > 0:
+		sprite.flip_h = false
+	elif face_direction < 0:
+		sprite.flip_h = true
 
 	emit_signal("player_updated",
 				face_direction,
