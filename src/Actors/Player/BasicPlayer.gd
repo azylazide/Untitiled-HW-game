@@ -163,7 +163,7 @@ func _physics_process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	
-	if current_action_state != ACTION_STATES.DEAD:
+	if not [ACTION_STATES.STAGGER,ACTION_STATES.DEAD].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				if event.is_action_pressed("jump"):
@@ -606,12 +606,21 @@ func _run_action_state(delta: float) -> int:
 		ACTION_STATES.NEUTRAL:
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.ATTACK:
+			#wait for shoot animation to fire
 			emit_signal("arrow_spawned",arrow_spawn_point,face_direction)
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.STAGGER:
+			
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.DEAD:
-			return ACTION_STATES.NEUTRAL
+			print("should dead")
+			
+			#wait for death animation ends
+			#emit signal dead
+			#then queue free
+			
+			#continue ragdoll
+			return ACTION_STATES.DEAD
 	return -2
 
 func _exit_action_state(delta: float, current: int) -> void:

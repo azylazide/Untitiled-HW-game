@@ -21,4 +21,4 @@ func _unhandled_input(event: InputEvent) -> void:
 		player.heal(50)
 	if event.is_action_pressed("debug_kill"):
 		var player = $Player
-		player.damage(100)
+		player.change_action_state(player.ACTION_STATES.DEAD)

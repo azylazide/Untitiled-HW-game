@@ -40,3 +40,6 @@ func _hurt_enemy(area: Area2D) -> void:
 		queue_free()
 
 
+func _on_VisibilityNotifier2D_screen_exited() -> void:
+	queue_free()
+	pass # Replace with function body.

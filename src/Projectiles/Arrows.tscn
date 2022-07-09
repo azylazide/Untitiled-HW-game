@@ -33,5 +33,10 @@ monitorable = false
 position = Vector2( 34, 0 )
 shape = SubResource( 2 )
 
+[node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+position = Vector2( -16, 0 )
+scale = Vector2( 1.1, 0.8 )
+
 [connection signal="area_entered" from="." to="." method="_on_Arrow_area_entered"]
 [connection signal="body_entered" from="." to="." method="_on_Arrow_body_entered"]
+[connection signal="screen_exited" from="VisibilityNotifier2D" to="." method="_on_VisibilityNotifier2D_screen_exited"]
