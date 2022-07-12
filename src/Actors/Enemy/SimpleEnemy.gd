@@ -28,6 +28,8 @@ func _ready() -> void:
 	
 	add_to_group("Enemies")
 	
+	connect("death",self,"die")
+	
 	direction = initial_direction
 	speed = MAX_WALK_TILE*Globals.TILE_UNITS
 	pass
@@ -105,3 +107,6 @@ func change_movement_state(next_state: int) -> void:
 
 func _apply_gravity(delta: float) -> void:
 	velocity.y += gravity*delta
+	
+func die() -> void:
+	queue_free()

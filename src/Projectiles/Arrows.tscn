@@ -7,7 +7,7 @@
 radius = 6.08276
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 37, 3 )
+extents = Vector2( 25, 7.5 )
 
 [node name="Arrow" type="Area2D"]
 collision_layer = 8
@@ -30,7 +30,7 @@ collision_mask = 3
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SpawnChecker"]
-position = Vector2( 34, 0 )
+position = Vector2( 22, 0 )
 shape = SubResource( 2 )
 
 [node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]

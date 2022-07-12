@@ -5,6 +5,10 @@ class_name HurtBox
 var is_colliding:= false
 var hitbox: HitBox
 
+var overlapping_areas:= []
+
+var group_to_check:= []
+
 func _ready() -> void:
 	pass
 
@@ -14,7 +18,7 @@ func _physics_process(delta: float) -> void:
 			hitbox.apply_damage(5)
 
 func _on_HurtBox_area_entered(area: Area2D) -> void:
-	if area.owner.is_in_group("Player"):
+	if area.owner.is_in_group("Player") and not is_colliding:
 		hitbox = area
 		is_colliding = true
 

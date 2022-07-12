@@ -19,8 +19,6 @@ func _ready() -> void:
 	velocity.x = xspeed*facing*Globals.TILE_UNITS
 
 func _physics_process(delta: float) -> void:
-	#TODO check if colliding at spawn
-	
 	position += velocity*delta
 
 #collided with body

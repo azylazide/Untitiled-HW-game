@@ -69,7 +69,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/base_state_machine/base_statemachine.gd"
 }, {
-"base": "Node",
+"base": "Node2D",
 "class": "WorldManager",
 "language": "GDScript",
 "path": "res://src/Main/WorldManager.gd"

@@ -111,6 +111,8 @@ func _ready() -> void:
 	
 	on_floor = check_floor()
 
+	connect("death",self,"die")
+
 
 func _debug_text() -> void:
 	debugtext1.text = "velocity: (%f,%f)" %[velocity.x,velocity.y] + "\nposition: (%f,%f)" %[global_position.x,global_position.y]
@@ -226,7 +228,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					change_action_state(ACTION_STATES.ATTACK)
 
 func _enter_movement_state(delta: float) -> void:
-	if current_action_state != ACTION_STATES.DEAD:
+	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				_ground_reset()
@@ -388,7 +390,7 @@ func _initial_action_state(delta: float) -> int:
 
 func _run_movement_state(delta: float) -> int:
 
-	if current_action_state != ACTION_STATES.DEAD:
+	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				#-Setup-
@@ -618,7 +620,7 @@ func _run_action_state(delta: float) -> int:
 			#wait for death animation ends
 			#emit signal dead
 			#then queue free
-			
+			queue_free()
 			#continue ragdoll
 			return ACTION_STATES.DEAD
 	return -2
@@ -628,6 +630,9 @@ func _exit_action_state(delta: float, current: int) -> void:
 
 func _exit_movement_state(delta: float, current: int) -> void:
 	pass
+
+func die() -> void:
+	change_action_state(ACTION_STATES.DEAD)
 
 
 #-HELPER FUNCTIONS-
