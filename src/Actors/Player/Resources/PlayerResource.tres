@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource( 1 )
 health = 100.0
+move_ability_flags = 7

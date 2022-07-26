@@ -3,7 +3,7 @@
 [ext_resource path="res://icon.png" type="Texture" id=1]
 [ext_resource path="res://src/Actors/Enemy/SimpleEnemy.gd" type="Script" id=2]
 [ext_resource path="res://src/Actors/Enemy/Resources/SimpleEnemy.tres" type="Resource" id=3]
-[ext_resource path="res://src/Props/HitHurtBoxes/HurtBox.gd" type="Script" id=4]
+[ext_resource path="res://src/Actors/Enemy/EnemyHurtBox.gd" type="Script" id=4]
 [ext_resource path="res://src/Props/HitHurtBoxes/HitBox.tscn" type="PackedScene" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
@@ -16,7 +16,7 @@ radius = 64.0
 extents = Vector2( 56, 52 )
 
 [node name="SimpleEnemy" type="KinematicBody2D"]
-collision_layer = 2
+collision_layer = 34
 script = ExtResource( 2 )
 actor_stats = ExtResource( 3 )
 MAX_WALK_TILE = 4.0
@@ -81,11 +81,10 @@ margin_right = 40.0
 margin_bottom = 14.0
 
 [node name="HitBox" parent="." instance=ExtResource( 5 )]
-collision_layer = 2
+collision_layer = 34
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
 position = Vector2( 0, -4 )
 shape = SubResource( 3 )
 
-[connection signal="area_entered" from="HurtBox" to="HurtBox" method="_on_HurtBox_area_entered"]
 [connection signal="area_exited" from="HurtBox" to="HurtBox" method="_on_HurtBox_area_exited"]

@@ -195,7 +195,7 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	#when falling
 	if current_state == movement_states.FALL:
 		vs = vertical_fast_smoothing
-		
+
 	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
 	output.y = lerp(global_position.y,clamped_pos.y,vs/zoom.y)
 	
