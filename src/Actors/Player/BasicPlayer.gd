@@ -659,6 +659,8 @@ func change_movement_state(next_state: int) -> void:
 	if next_state == current_movement_state:
 		return
 	
+	validate_ability(next_state)
+	
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
 	emit_signal("movement_changed",next_state)
@@ -697,6 +699,28 @@ func _enter_jump() -> void:
 		_:
 			velocity.y = -jump_force
 
+func validate_ability(next_state: int) -> bool:
+	#ability flags
+	#DASH DJUMP WALLCLIMB
+	var ability_flags: int = actor_stats.move_ability_flags
+	match next_state:
+		MOVEMENT_STATES.GDASH:
+			if ability_flags & 0b100:
+				print("should be able to gdash")
+		MOVEMENT_STATES.ADASH:
+			if ability_flags & 0b100:
+				print("should be able to adash")
+		MOVEMENT_STATES.JUMP:
+			if previous_movement_state == MOVEMENT_STATES.FALL:
+				if ability_flags & 0b010:
+					print("should be able to djump")
+			elif previous_movement_state == MOVEMENT_STATES.WALL:
+				if ability_flags & 0b001:
+					print("should be able to wjump")
+		MOVEMENT_STATES.WALL:
+			if ability_flags & 0b001:
+				print("should be able to wslide")
+	return true
 
 #get current input direction
 func get_direction() -> float:
