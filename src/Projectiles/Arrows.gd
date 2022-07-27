@@ -1,5 +1,6 @@
 extends Area2D
 
+export(float) var damage = 50
 export(float) var xspeed = 50
 
 var facing:= 1.0
@@ -34,7 +35,7 @@ func _on_Arrow_area_entered(area: Area2D) -> void:
 func _hurt_enemy(area: Area2D) -> void:
 	if area.owner.is_in_group("Enemies"):
 		print(area.owner)
-		area.apply_damage(50)
+		area.apply_damage(damage)
 		queue_free()
 
 

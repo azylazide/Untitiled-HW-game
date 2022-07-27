@@ -18,8 +18,8 @@ export(int, -1,1) var INITIAL_DIRECTION:= 1
 enum MOVEMENT_STATES {IDLE,WALK,FALL,JUMP,GDASH,ADASH,WALL}
 export(MOVEMENT_STATES) var current_movement_state = MOVEMENT_STATES.IDLE
 
-enum ACTION_STATES {NEUTRAL,ATTACK,STAGGER,DEAD}
-export(ACTION_STATES) var current_action_state = ACTION_STATES.NEUTRAL
+enum ACTION_STATES {NEUTRAL,ATTACK,STAGGER,DEAD,AUTO}
+export(ACTION_STATES) var current_action_state = ACTION_STATES.AUTO
 
 onready var floor_cast:= $RayCast2D
 onready var left_raycast:= $WallRays/LeftRay
@@ -61,6 +61,8 @@ onready var wall_normal:= Vector2.ZERO
 
 onready var sprite:= $Sprite
 onready var arrow_spawn_point:= $ArrowSpawnPoint
+
+onready var arrow_scn:= preload("res://src/Projectiles/Arrows.tscn")
 
 var on_floor: bool
 var on_wall: bool
@@ -119,8 +121,13 @@ func _debug_text() -> void:
 	debugtext2.text = "coyote: " + ("on" if not coyote_timer.is_stopped() else "off")
 	debugtext3.text = "is on floor: " + str(on_floor) + "\nwas on floor: " + str(was_on_floor)
 	debugtext4.text = "face dir: " + ("left" if face_direction < 0 else "right")
-	debugtext5.text = ("MOVEMENT STATES\nprev state: %d\ncurrent state: %d\n(next: %d)\nACTION STATES\nprev state: %d\ncurrent state: %d\n(next %d)" 
-						%[previous_movement_state,current_movement_state,next_movement_state,previous_action_state,current_action_state,next_action_state])
+	debugtext5.text = ("MOVEMENT STATES\nprev state: %s\ncurrent state: %s\n(next: %s)\nACTION STATES\nprev state: %s\ncurrent state: %s\n(next %s)" 
+						%[Globals.player_move_state_name(previous_movement_state),
+						Globals.player_move_state_name(current_movement_state),
+						Globals.player_move_state_name(next_movement_state),
+						Globals.player_action_state_name(previous_action_state),
+						Globals.player_action_state_name(current_action_state),
+						Globals.player_action_state_name(next_action_state)])
 	debugtext6.text = "on wall: " + str(on_wall)
 	debugtext7.text = "can ajump: " + str(can_ajump) + "\ncan adash: " + str(can_adash)
 	debugtext8.text = "Health: " + str(actor_stats.health)
@@ -165,7 +172,7 @@ func _physics_process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	
-	if not [ACTION_STATES.STAGGER,ACTION_STATES.DEAD].has(current_action_state):
+	if not [ACTION_STATES.STAGGER,ACTION_STATES.DEAD,ACTION_STATES.AUTO].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				if event.is_action_pressed("jump"):
@@ -228,7 +235,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					change_action_state(ACTION_STATES.ATTACK)
 
 func _enter_movement_state(delta: float) -> void:
-	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER].has(current_action_state):
+	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER,ACTION_STATES.AUTO].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				_ground_reset()
@@ -390,7 +397,7 @@ func _initial_action_state(delta: float) -> int:
 
 func _run_movement_state(delta: float) -> int:
 
-	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER].has(current_action_state):
+	if not [ACTION_STATES.DEAD,ACTION_STATES.STAGGER,ACTION_STATES.AUTO].has(current_action_state):
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				#-Setup-
@@ -609,7 +616,7 @@ func _run_action_state(delta: float) -> int:
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.ATTACK:
 			#wait for shoot animation to fire
-			emit_signal("arrow_spawned",arrow_spawn_point,face_direction)
+			emit_signal("arrow_spawned",arrow_scn,arrow_spawn_point,face_direction)
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.STAGGER:
 			
@@ -623,6 +630,9 @@ func _run_action_state(delta: float) -> int:
 			queue_free()
 			#continue ragdoll
 			return ACTION_STATES.DEAD
+		ACTION_STATES.AUTO:
+			#when control must be relinquished
+			return ACTION_STATES.NEUTRAL
 	return -2
 
 func _exit_action_state(delta: float, current: int) -> void:

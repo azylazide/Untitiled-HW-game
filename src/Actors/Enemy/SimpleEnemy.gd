@@ -110,3 +110,14 @@ func _apply_gravity(delta: float) -> void:
 	
 func die() -> void:
 	queue_free()
+
+
+func _on_VisibilityEnabler2D_screen_entered() -> void:
+	visible = true
+	pass # Replace with function body.
+
+
+func _on_VisibilityEnabler2D_screen_exited() -> void:
+	#consider setting visibility for those outside the first spawn
+	visible = false
+	pass # Replace with function body.

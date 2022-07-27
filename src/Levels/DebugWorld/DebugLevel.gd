@@ -1,14 +1,12 @@
 extends WorldManager
 
-onready var arrow_scn:= preload("res://src/Projectiles/Arrows.tscn")
-
 var pause = false
 
 func _ready() -> void:
 	$Player.connect("arrow_spawned",self,"spawn_arrow")
 	pass
 
-func spawn_arrow(spawn_point: Position2D, facing: float) -> void:
+func spawn_arrow(arrow_scn: PackedScene, spawn_point: Position2D, facing: float) -> void:
 	var arrow = arrow_scn.instance()
 	arrow.global_position = spawn_point.global_position
 	arrow.facing = facing
