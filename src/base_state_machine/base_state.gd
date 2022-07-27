@@ -23,3 +23,9 @@ func state_input(_event: InputEvent) -> void:
 
 func state_process(_delta: float) -> void:
 	pass
+
+func initialize_inhibiting_connection() -> void:
+	pass
+
+func inhibiting_state_check(broadcasting_SM: String, broadcasted_state: String) -> void:
+	pass
