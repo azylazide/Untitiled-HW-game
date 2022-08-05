@@ -38,8 +38,11 @@ onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
 
 onready var auto_timer:= $Timers/AutoTimer
 
-onready var camera_bbox_detector = $CameraBBoxDetector
-onready var camera_center = $CameraCenter
+onready var camera_bbox_detector:= $CameraBBoxDetector
+onready var camera_center:= $CameraCenter
+
+onready var particle_pivot:= $ParticlePivot
+onready var dash_particle_emitter:= $ParticlePivot/DashParticles
 
 onready var debugtext1:= $CanvasLayer/VBoxContainer/Label
 onready var debugtext2:= $CanvasLayer/VBoxContainer/Label2
@@ -109,6 +112,8 @@ func _ready() -> void:
 	auto_timer.wait_time = AUTO_TIME
 	auto_timer.start()
 	
+	dash_particle_emitter.lifetime = DASH_TIME*2
+	
 	face_direction = 1.0
 	
 	on_floor = check_floor()
@@ -137,6 +142,29 @@ func _physics_process(delta: float) -> void:
 	_debug_text()
 
 	#MOVEMENT STATEMACHINE
+	_movement_statemachine(delta)
+	
+	#ACTION STATEMACHINE
+	_action_statemachine(delta)
+
+	#After movement changes
+
+	_face_direction_changes()
+
+	#make particle direction opposite of movement
+	if velocity.x > 0:
+		dash_particle_emitter.process_material.set_direction(Vector3(-particle_pivot.scale.x,0,0))
+	elif velocity.x < 0:
+		dash_particle_emitter.process_material.set_direction(Vector3(particle_pivot.scale.x,0,0))
+	
+	emit_signal("player_updated",
+				face_direction,
+				velocity,
+				previous_movement_state,
+				current_movement_state,
+				camera_center.global_position)
+
+func _movement_statemachine(delta) -> void:
 	if previous_frame_movement_state != current_movement_state:
 		_enter_movement_state(delta)
 	next_movement_state = (_initial_movement_state(delta) if previous_frame_movement_state == -1 
@@ -145,7 +173,7 @@ func _physics_process(delta: float) -> void:
 		_exit_movement_state(delta,current_movement_state)
 	change_movement_state(next_movement_state)
 	
-	#ACTION STATEMACHINE
+func _action_statemachine(delta) -> void:
 	if previous_frame_action_state != current_action_state:
 		_enter_action_state(delta)
 	next_action_state = (_initial_action_state(delta) if previous_frame_action_state == -1 
@@ -153,22 +181,6 @@ func _physics_process(delta: float) -> void:
 	if next_action_state != current_action_state:
 		_exit_action_state(delta,current_action_state)
 	change_action_state(next_action_state)
-
-	#debug sprite
-	if face_direction > 0:
-		sprite.flip_h = false
-		arrow_spawn_point.position.x = abs(arrow_spawn_point.position.x)
-	elif face_direction < 0:
-		sprite.flip_h = true
-		arrow_spawn_point.position.x = -abs(arrow_spawn_point.position.x)
-
-	emit_signal("player_updated",
-				face_direction,
-				velocity,
-				previous_movement_state,
-				current_movement_state,
-				camera_center.global_position)
-
 
 func _unhandled_input(event: InputEvent) -> void:
 	
@@ -254,12 +266,14 @@ func _enter_movement_state(delta: float) -> void:
 				return
 			
 			MOVEMENT_STATES.GDASH:
+				dash_particle_emitter.emitting = true
 				dash_cooldown_timer.start()
 				velocity.x = dash_force*face_direction
 				dash_timer.start()
 				return
 			
 			MOVEMENT_STATES.ADASH:
+				dash_particle_emitter.emitting = true
 				dash_cooldown_timer.start()
 				can_adash = false
 				velocity.x = dash_force*face_direction
@@ -575,7 +589,7 @@ func _run_movement_state(delta: float) -> int:
 			
 			MOVEMENT_STATES.WALL:
 				#-Setup-
-				var snap = Vector2.ZERO
+				var snap = -1.5*Globals.TILE_UNITS*wall_normal
 				var dir = get_direction()
 				velocity.y += 0.1*fall_gravity*delta
 				velocity.y = min(velocity.y,0.5*MAX_FALL_TILE*Globals.TILE_UNITS) 
@@ -725,6 +739,17 @@ func validate_ability(next_state: int) -> bool:
 #get current input direction
 func get_direction() -> float:
 	return Input.get_axis("left","right")
+
+func _face_direction_changes() -> void:
+	#debug sprite
+	if face_direction > 0:
+		sprite.flip_h = false
+		arrow_spawn_point.position.x = abs(arrow_spawn_point.position.x)
+		particle_pivot.scale.x = 1
+	elif face_direction < 0:
+		sprite.flip_h = true
+		arrow_spawn_point.position.x = -abs(arrow_spawn_point.position.x)
+		particle_pivot.scale.x = -1
 
 #check when on floor or coyote is enabled
 func check_floor() -> bool:
