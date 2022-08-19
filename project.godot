@@ -99,6 +99,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Globals="*res://src/Globals/Globals.gd"
+SignalBus="*res://src/Globals/signal_bus.gd"
 
 [display]
 

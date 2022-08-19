@@ -3,7 +3,7 @@ extends WorldManager
 var pause = false
 
 func _ready() -> void:
-	$Player.connect("arrow_spawned",self,"spawn_arrow")
+	SignalBus.connect("projectile_spawned",self,"spawn_arrow")
 	pass
 
 func spawn_arrow(arrow_scn: PackedScene, spawn_point: Position2D, facing: float) -> void:

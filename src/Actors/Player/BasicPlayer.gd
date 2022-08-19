@@ -81,10 +81,7 @@ var previous_action_state:= -1
 var next_action_state:= -1
 var previous_frame_action_state:= -1
 
-signal movement_changed()
-signal action_changed()
-signal player_updated()
-signal arrow_spawned()
+#signals: see SignalBus
 
 
 func _ready() -> void:
@@ -157,7 +154,7 @@ func _physics_process(delta: float) -> void:
 	elif velocity.x < 0:
 		dash_particle_emitter.process_material.set_direction(Vector3(particle_pivot.scale.x,0,0))
 	
-	emit_signal("player_updated",
+	SignalBus.emit_signal("player_updated",
 				face_direction,
 				velocity,
 				previous_movement_state,
@@ -630,7 +627,7 @@ func _run_action_state(delta: float) -> int:
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.ATTACK:
 			#wait for shoot animation to fire
-			emit_signal("arrow_spawned",arrow_scn,arrow_spawn_point,face_direction)
+			SignalBus.emit_signal("projectile_spawned",arrow_scn,arrow_spawn_point,face_direction)
 			return ACTION_STATES.NEUTRAL
 		ACTION_STATES.STAGGER:
 			
@@ -677,7 +674,7 @@ func change_movement_state(next_state: int) -> void:
 	
 	previous_movement_state = current_movement_state
 	current_movement_state = next_state
-	emit_signal("movement_changed",next_state)
+	SignalBus.emit_signal("movement_changed",next_state)
 
 #record previous state and change current state
 func change_action_state(next_state: int) -> void:
@@ -688,7 +685,7 @@ func change_action_state(next_state: int) -> void:
 	
 	previous_action_state = current_action_state
 	current_action_state = next_state
-	emit_signal("action_changed",next_state)
+	SignalBus.emit_signal("action_changed",next_state)
 
 
 #check previous state before jump
