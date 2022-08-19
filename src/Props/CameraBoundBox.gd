@@ -10,7 +10,7 @@ export(bool) var limit_bottom = true
 
 export(int) var priority_level = 0
 
-func _ready():
+func _init():
 	monitoring = false
 	set_collision_layer_bit(0,false)
 	set_collision_layer_bit(4,true)
