@@ -24,11 +24,14 @@ onready var gravity:= 15*Globals.TILE_UNITS
 
 onready var debug_label:= $VBoxContainer/Label
 
+var player_alive:= true
+
 func _ready() -> void:
 	
 	add_to_group("Enemies")
 	
 	connect("death",self,"die")
+	SignalBus.connect("player_dying",self,"debug_stop")
 	
 	direction = initial_direction
 	speed = MAX_WALK_TILE*Globals.TILE_UNITS
@@ -89,6 +92,10 @@ func _run_state(delta: float) -> int:
 				velocity.x = lerp(velocity.x,speed*direction,0.05)
 				_apply_gravity(delta)
 				velocity = move_and_slide_with_snap(velocity,Vector2.DOWN*50,Vector2.UP)
+				
+				if not player_alive:
+					return MOVEMENT_STATES.IDLE
+				
 				return MOVEMENT_STATES.WALK
 	return -1
 
@@ -111,6 +118,8 @@ func _apply_gravity(delta: float) -> void:
 func die() -> void:
 	queue_free()
 
+func debug_stop() -> void:
+	player_alive = false
 
 func _on_VisibilityEnabler2D_screen_entered() -> void:
 	visible = true

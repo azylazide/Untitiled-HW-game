@@ -11,6 +11,7 @@ extends Node
 
 #player to level manager connection
 signal projectile_spawned
+signal player_dying
 
 signal movement_changed
 signal action_changed

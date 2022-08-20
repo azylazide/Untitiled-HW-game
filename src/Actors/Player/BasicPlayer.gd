@@ -44,6 +44,8 @@ onready var camera_center:= $CameraCenter
 onready var particle_pivot:= $ParticlePivot
 onready var dash_particle_emitter:= $ParticlePivot/DashParticles
 
+onready var animation_player:= $AnimationPlayer
+
 onready var debugtext1:= $CanvasLayer/VBoxContainer/Label
 onready var debugtext2:= $CanvasLayer/VBoxContainer/Label2
 onready var debugtext3:= $CanvasLayer/VBoxContainer/Label3
@@ -248,18 +250,22 @@ func _enter_movement_state(delta: float) -> void:
 		match current_movement_state:
 			MOVEMENT_STATES.IDLE:
 				_ground_reset()
+				animation_player.play("hw_idle")
 				return
 				
 			MOVEMENT_STATES.WALK:
 				_ground_reset()
+				animation_player.play("hw_run")
 				return
 				
 			MOVEMENT_STATES.FALL:
+				animation_player.play("hw_idle")
 				return
 				
 			MOVEMENT_STATES.JUMP:
 				coyote_timer.stop()
 				_enter_jump()
+				animation_player.play("hw_idle")
 				return
 			
 			MOVEMENT_STATES.GDASH:
@@ -267,6 +273,7 @@ func _enter_movement_state(delta: float) -> void:
 				dash_cooldown_timer.start()
 				velocity.x = dash_force*face_direction
 				dash_timer.start()
+				animation_player.play("hw_idle")
 				return
 			
 			MOVEMENT_STATES.ADASH:
@@ -276,6 +283,7 @@ func _enter_movement_state(delta: float) -> void:
 				velocity.x = dash_force*face_direction
 				velocity.y = 0
 				dash_timer.start()
+				animation_player.play("hw_idle")
 				return
 			
 			MOVEMENT_STATES.WALL:
@@ -284,6 +292,7 @@ func _enter_movement_state(delta: float) -> void:
 				velocity.y = 0
 				wall_cooldown_timer.start()
 				wall_slide_timer.start()
+				animation_player.play("hw_idle")
 				return
 
 
@@ -653,6 +662,7 @@ func _exit_movement_state(delta: float, current: int) -> void:
 	pass
 
 func die() -> void:
+	SignalBus.emit_signal("player_dying")
 	change_action_state(ACTION_STATES.DEAD)
 
 
